@@ -4,3 +4,8 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+
+
+JWT_SECRET_KET: ${JWT_SECRET_KET}
+JWT_ACCESS_EXPIRE_TIME: 1000 * 60L * 30L
+JWT_REFRESH_EXPIRE_TIME: 1000 * 60L * 30L
