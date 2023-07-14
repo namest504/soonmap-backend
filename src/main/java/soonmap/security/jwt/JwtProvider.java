@@ -7,24 +7,21 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
-import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.exception.CustomException;
 import soonmap.repository.MemberRepository;
 
 import java.util.Date;
 
-@PropertySource("security.properties")
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
 
     @Value("${JWT_SECRET_KET}")
     private String JWT_SECRET_KET;
-    @Value("${JWT_ACCESS_EXPIRE_TIME}")
-    private Long JWT_ACCESS_EXPIRE_TIME;
-    @Value("${JWT_REFRESH_EXPIRE_TIME")
-    private Long JWT_REFRESH_EXPIRE_TIME;
+
+    private final Long JWT_ACCESS_EXPIRE_TIME = 1000 * 60L * 5L;
+    private final Long JWT_REFRESH_EXPIRE_TIME = 1000 * 60L * 60L * 24L;
 
     private final MemberRepository memberRepository;
 
