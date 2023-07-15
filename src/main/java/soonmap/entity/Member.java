@@ -2,10 +2,13 @@ package soonmap.entity;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,9 +25,18 @@ public class Member implements UserDetails {
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
+    private boolean isBan;
+
+    private boolean isAdmin;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        if (isAdmin) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+        return authorities;
     }
 
     @Override
@@ -34,27 +46,27 @@ public class Member implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return this.userEmail;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return this.isBan;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return this.isBan;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return this.isBan;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return this.isBan;
     }
 
 }
