@@ -20,33 +20,17 @@ public class JwtProvider {
     @Value("${JWT_SECRET_KET}")
     private String JWT_SECRET_KET;
 
-    private final Long JWT_ACCESS_EXPIRE_TIME = 1000 * 60L * 5L;
-    private final Long JWT_REFRESH_EXPIRE_TIME = 1000 * 60L * 60L * 24L;
-
     private final MemberRepository memberRepository;
 
-    public String createAccessToken(Long uid) {
+    public String createToken(String email, String TokenType, Long Token_Expire_Time) {
         Claims claims = Jwts.claims().setSubject("access_token");
-        claims.put("uid", uid);
+        claims.put("userEmail", email);
         Date currentTime = new Date();
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(currentTime)
-                .setExpiration(new Date(currentTime.getTime() + JWT_ACCESS_EXPIRE_TIME))
-                .signWith(SignatureAlgorithm.HS256, JWT_SECRET_KET)
-                .compact();
-    }
-
-    public String createRefreshToken(Long uid) {
-        Claims claims = Jwts.claims().setSubject("refresh_token");
-        claims.put("uid", uid);
-        Date currentTime = new Date();
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(currentTime)
-                .setExpiration(new Date(currentTime.getTime() + JWT_REFRESH_EXPIRE_TIME))
+                .setExpiration(new Date(currentTime.getTime() + Token_Expire_Time))
                 .signWith(SignatureAlgorithm.HS256, JWT_SECRET_KET)
                 .compact();
     }
