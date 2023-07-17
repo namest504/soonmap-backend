@@ -1,7 +1,8 @@
-package soonmap.security.oauth.naver;
+package soonmap.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import soonmap.security.oauth.naver.NaverLoginBO;
 
 @Configuration
 public class Appconfig {
