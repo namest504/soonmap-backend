@@ -1,4 +1,4 @@
-package soonmap.Dto;
+package soonmap.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenDto {
+public class Tokendto {
     private String AccessToken;
     private String RefreshToken;
 }

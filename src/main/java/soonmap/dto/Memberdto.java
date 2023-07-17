@@ -1,4 +1,4 @@
-package soonmap.Dto;
+package soonmap.dto;
 
 
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import soonmap.entity.Member;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberDto {
+public class Memberdto {
     private String userName;
     private String userEmail;
     private AccountType accountType;

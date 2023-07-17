@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import soonmap.Dto.MemberDto;
-import soonmap.Dto.TokenDto;
+import soonmap.dto.Memberdto;
+import soonmap.dto.Tokendto;
 import soonmap.entity.Member;
 import soonmap.repository.MemberRepository;
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
-    public Member saveUser(MemberDto userDto) {
+    public Member saveUser(Memberdto userDto) {
         Member member = Member.builder()
                 .userName(userDto.getUserName())
                 .userEmail(userDto.getUserEmail())
@@ -37,7 +37,7 @@ public class MemberService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
-    public ResponseCookie createHttpOnlyCookie(TokenDto tokenDto) {
+    public ResponseCookie createHttpOnlyCookie(Tokendto tokenDto) {
         //HTTPONLY 쿠키에 RefreshToken 생성후 전달
         String refreshToken = tokenDto.getRefreshToken();
         String accessToken = tokenDto.getAccessToken();

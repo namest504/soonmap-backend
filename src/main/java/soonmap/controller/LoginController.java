@@ -10,8 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import soonmap.Dto.MemberDto;
-import soonmap.Dto.TokenDto;
+import soonmap.dto.Memberdto;
+import soonmap.dto.Tokendto;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.security.oauth.naver.NaverLoginBO;
@@ -57,10 +57,10 @@ public class LoginController {
 
             Optional<Member> member = memberService.findUserById(id);
             if (member.isEmpty()) {
-                MemberDto memberDto = new MemberDto(name, email, AccountType.NAVER, id);
+                Memberdto memberDto = new Memberdto(name, email, AccountType.NAVER, id);
                 memberService.saveUser(memberDto);
             }
-            TokenDto tokenDto = tokenService.createTokens(email);
+            Tokendto tokenDto = tokenService.createTokens(email);
 
             ResponseCookie responseCookie = memberService.createHttpOnlyCookie(tokenDto);
             return ResponseEntity.ok()
