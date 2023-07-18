@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import soonmap.dto.MemberDto;
 import soonmap.dto.MemberDto.NaverMemberResponse;
 import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
@@ -36,7 +35,7 @@ public class LoginController {
     private String apiResult = null;
 
 
-
+    // Client가 Server에게 보낸 code, state를 받고 AccessToken을 생성 후 사용자 정보를 추출한다.
     @RequestMapping(value = "/callback", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<String> callback(@RequestParam String code, @RequestParam String state) {
         OAuth2AccessToken oauthToken;
@@ -49,6 +48,7 @@ public class LoginController {
             String email = json.getJSONObject("response").getString("email");
             String id = json.getJSONObject("response").getString("id");
 
+            // Member의 존재 여부에 따라 사용자 저장 여부 결정
             Optional<Member> member = Optional.ofNullable(memberService.findUserByEmail(email));
             if (member.isEmpty()) {
                 NaverMemberResponse naverMemberResponse = new NaverMemberResponse(name, email, AccountType.NAVER, id);
@@ -57,6 +57,7 @@ public class LoginController {
             }
             log.info("새 유저입니다.");
 
+            //AccessToken과 RefreshToken 분리 생성
             String AccessToken = jwtProvider.createAccessToken(email);
             String RefreshToken = jwtProvider.createRefreshToken(email);
 
@@ -73,34 +74,6 @@ public class LoginController {
     }
 
     //todo: jwt 토큰 갱신, 삭제 로직 구현 필요
-//    @RequestMapping(value = "/refresh", method = RequestMethod.GET)
-//    public ResponseEntity<String> refresh(@RequestParam String refreshToken) {
-//        try {
-//            OAuth2AccessToken newAccessToken = naverLoginBO.refreshAccessToken(refreshToken);
-//            if (newAccessToken != null) {
-//                String newAccessTokenValue = newAccessToken.getAccessToken();
-//
-//                // 갱신된 AccessToken을 사용하여 추가 작업 수행
-//                // 예시: naverLoginBO.getUserProfile(newAccessToken);
-//
-//                return ResponseEntity.ok("New Access Token: " + newAccessTokenValue);
-//            } else {
-//                // AccessToken을 갱신할 수 없는 경우
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to refresh access token.");
-//            }
-//        } catch (IOException e) {
-//            // 예외 처리
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to refresh access token.");
-//        }
-//    }
-//    @ResponseBody
-//    @GetMapping("/remove") //token = access_token임
-//    public String remove(@RequestParam String token, HttpSession session, HttpServletRequest request) {
-//
-//        String deleteURL = naverLoginBO.removeAccessToken(token);
-//        session.invalidate();
-//
-//        return "deleteURL";
-//    }
+    //RE: 밑의 코드는 네이버 토큰 관련 코드여서 저희에게는 필요 없다고 판단 후, 삭제하였습니다.
 
 }
