@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import soonmap.dto.MemberDto;
 import soonmap.dto.MemberDto.NaverMemberResponse;
 import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
@@ -36,15 +37,11 @@ public class LoginController {
 
 
 
-    @RequestMapping(value = "/naver/code/{code}/state/{state}", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<String> callBack(@PathVariable String code, @PathVariable String state) {
-
-        log.info(code);
-        log.info(state);
+    @RequestMapping(value = "/callback", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<String> callback(@RequestParam String code, @RequestParam String state) {
         OAuth2AccessToken oauthToken;
         try {
             oauthToken = naverLoginBO.getAccessToken(code, state);
-
             apiResult = naverLoginBO.getUserProfile(oauthToken);
 
             JSONObject json = new JSONObject(apiResult);
@@ -52,15 +49,20 @@ public class LoginController {
             String email = json.getJSONObject("response").getString("email");
             String id = json.getJSONObject("response").getString("id");
 
-            Optional<Member> member = memberService.findUserById(id);
+            Optional<Member> member = Optional.ofNullable(memberService.findUserByEmail(email));
             if (member.isEmpty()) {
                 NaverMemberResponse naverMemberResponse = new NaverMemberResponse(name, email, AccountType.NAVER, id);
                 memberService.saveUser(naverMemberResponse);
+                log.info("이미 있는 유저입니다.");
             }
-            String accessToken = jwtProvider.createAccessToken(email);
-            String refreshToken = jwtProvider.createRefreshToken(email);
+            log.info("새 유저입니다.");
 
-            ResponseCookie responseCookie = memberService.createHttpOnlyCookie(new TokenDto(accessToken, refreshToken));
+            String AccessToken = jwtProvider.createAccessToken(email);
+            String RefreshToken = jwtProvider.createRefreshToken(email);
+
+            TokenDto tokenDto = new TokenDto(AccessToken, RefreshToken);
+
+            ResponseCookie responseCookie = memberService.createHttpOnlyCookie(tokenDto);
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                     .body("Name: " + name + ", Email: " + email+ ", id: " + id);
@@ -70,7 +72,7 @@ public class LoginController {
         }
     }
 
-    //todo: 토큰 갱신, 삭제 로직 구현 필요
+    //todo: jwt 토큰 갱신, 삭제 로직 구현 필요
 //    @RequestMapping(value = "/refresh", method = RequestMethod.GET)
 //    public ResponseEntity<String> refresh(@RequestParam String refreshToken) {
 //        try {
