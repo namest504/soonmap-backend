@@ -27,6 +27,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .setAuthentication(
                             jwtProvider.getAuthentication(jwt));
         }
+
+        filterChain.doFilter(request, response);
+
     }
 
     private String retrieveToken(HttpServletRequest request) {

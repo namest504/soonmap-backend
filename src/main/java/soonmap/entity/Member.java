@@ -35,6 +35,8 @@ public class Member implements UserDetails {
 
     private boolean isAdmin;
 
+    private String snsId;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
