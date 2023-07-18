@@ -18,6 +18,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class MemberService implements UserDetailsService {
+
     private final MemberRepository memberRepository;
 
     public Member saveUser(NaverMemberResponse naverMemberResponse) {
