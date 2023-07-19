@@ -7,7 +7,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import soonmap.dto.MemberDto;
 import soonmap.dto.MemberDto.NaverMemberResponse;
+import soonmap.dto.MemberDto.KakaoMemberResponse;
 import soonmap.dto.TokenDto;
 import soonmap.entity.Member;
 import soonmap.repository.MemberRepository;
@@ -21,12 +23,24 @@ public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
-    public Member saveUser(NaverMemberResponse naverMemberResponse) {
+    public Member saveUser_naver(NaverMemberResponse naverMemberResponse) {
         Member member = Member.builder()
                 .userName(naverMemberResponse.getUserName())
                 .userEmail(naverMemberResponse.getUserEmail())
                 .accountType(naverMemberResponse.getAccountType())
                 .snsId(naverMemberResponse.getSnsId())
+                .isBan(false)
+                .isAdmin(false)
+                .build();
+        return memberRepository.save(member);
+    }
+
+    public Member saveUser_kakao(KakaoMemberResponse kakaoMemberResponse) {
+        Member member = Member.builder()
+                .userName(kakaoMemberResponse.getUserName())
+                .userEmail(kakaoMemberResponse.getUserEmail())
+                .accountType(kakaoMemberResponse.getAccountType())
+                .snsId(kakaoMemberResponse.getSnsId()) // kakaoId는 Long으로 반환을 받아야돼서 toString 메소드를 이용해 string으로 변경하였습니다.
                 .isBan(false)
                 .isAdmin(false)
                 .build();

@@ -50,18 +50,7 @@ public class JwtProvider {
                 .compact();
     }
 
-//    public String createToken(String email, String TokenType, Long Token_Expire_Time) {
-//        Claims claims = Jwts.claims().setSubject("access_token");
-//        claims.put("userEmail", email);
-//        Date currentTime = new Date();
-//
-//        return Jwts.builder()
-//                .setClaims(claims)
-//                .setIssuedAt(currentTime)
-//                .setExpiration(new Date(currentTime.getTime() + Token_Expire_Time))
-//                .signWith(SignatureAlgorithm.HS256, JWT_SECRET_KET)
-//                .compact();
-//    }
+
 
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
         String Email = getEmailFromToken(token);

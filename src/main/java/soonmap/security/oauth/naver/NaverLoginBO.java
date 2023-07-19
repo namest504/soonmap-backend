@@ -9,7 +9,9 @@ import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import soonmap.dto.SocialUserInfoDto;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -98,7 +100,7 @@ public class NaverLoginBO {
         return (String) session.getAttribute(SESSION_STATE);
     }
 //    AccessToken을 이용해 네이버 사용자프로필 API를 호출
-    public String getUserProfile(OAuth2AccessToken oAuth2AccessToken) throws  IOException {
+    public SocialUserInfoDto getUserProfile(OAuth2AccessToken oAuth2AccessToken) throws  IOException {
         OAuth20Service oAuth20Service = new ServiceBuilder()
                 .apiKey(CLIENT_ID)
                 .apiSecret(CLIENT_SECRET)
@@ -106,7 +108,14 @@ public class NaverLoginBO {
         OAuthRequest request = new OAuthRequest(Verb.GET, PROFILE_API_URL, oAuth20Service);
         oAuth20Service.signRequest(oAuth2AccessToken, request);
         Response response = request.send();
-        return response.getBody();
+
+        JSONObject json = new JSONObject(response.getBody());
+        String name = json.getJSONObject("response").getString("name");
+        String email = json.getJSONObject("response").getString("email");
+        String id = json.getJSONObject("response").getString("id");
+
+        SocialUserInfoDto socialUserInfoDto = new SocialUserInfoDto(id, name, email);
+        return socialUserInfoDto;
     }
 
     public String removeAccessToken(String accessToken) {
