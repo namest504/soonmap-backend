@@ -105,7 +105,7 @@ public class LoginController {
             // Member의 존재 여부에 따라 사용자 저장 여부 결정
             Optional<Member> member = Optional.ofNullable(memberService.findUserByEmail(email));
             if (member.isEmpty()) {
-                KakaoMemberResponse kakaoMemberResponse = new KakaoMemberResponse(name, email, AccountType.NAVER, id);
+                KakaoMemberResponse kakaoMemberResponse = new KakaoMemberResponse(name, email, AccountType.KAKAO, id);
                 memberService.saveUser_kakao(kakaoMemberResponse);
                 log.info("이미 있는 유저입니다.");
             }
