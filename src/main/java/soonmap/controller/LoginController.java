@@ -19,9 +19,9 @@ import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.security.jwt.JwtProvider;
-import soonmap.security.oauth.kakao.KakaoTokenJsonData;
-import soonmap.security.oauth.kakao.KakaoUserInfo;
-import soonmap.security.oauth.naver.NaverLoginBO;
+
+import soonmap.security.oauth.KakaoLoginBO;
+import soonmap.security.oauth.NaverLoginBO;
 import soonmap.service.MemberService;
 
 import java.io.IOException;
@@ -38,8 +38,7 @@ public class LoginController {
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
     private final NaverLoginBO naverLoginBO;
-    private final KakaoTokenJsonData kakaoTokenJsonData;
-    private final KakaoUserInfo kakaoUserInfo;
+    private final KakaoLoginBO kakaoLoginBO;
 
 
     private String apiResult = null;
@@ -87,16 +86,18 @@ public class LoginController {
 
     //todo: jwt 토큰 갱신, 삭제 로직 구현 필요
     //RE: 밑의 코드는 네이버 토큰 관련 코드여서 저희에게는 필요 없다고 판단 후, 삭제하였습니다.
+
     /**
      * kakao oauth
      */
     @RequestMapping(value = "/kakao/callback", method = {RequestMethod.POST, RequestMethod.GET})
-    public ResponseEntity<String> kakaoLogin(@RequestParam("code") String code){
+    public ResponseEntity<String> kakaoLogin(@RequestParam("code") String code) {
+        OAuth2AccessToken oAuthToken;
         try {
-            log.info("인가 코드를 이용하여 토큰을 받습니다.");
-            String token = kakaoTokenJsonData.getToken(code);
-            log.info("토큰에 대한 정보입니다.{}", token);
-            SocialUserInfoDto userInfo = kakaoUserInfo.getKakaoUserInfo(token);
+            log.info("인가 코드를 이용하여    토큰을 받습니다.");
+            oAuthToken = kakaoLoginBO.getAccessToken(code);
+            log.info("토큰에 대한 정보입니다.{}", oAuthToken);
+            SocialUserInfoDto userInfo = kakaoLoginBO.getKakaoUserInfo(oAuthToken);
             String id = userInfo.getId();
             String name = userInfo.getNickname();
             String email = userInfo.getEmail();
@@ -123,8 +124,7 @@ public class LoginController {
 
         } catch (HttpClientErrorException.BadRequest ex) {
             // HttpClientErrorException$BadRequest 처리
-            // 예: Redirect URI mismatch 등의 오류 처리
-            // ex.getStatusCode(), ex.getStatusText() 등을 이용하여 세부 정보 확인 가능
+
             log.error("Kakao API Bad Request: " + ex.getStatusCode() + " " + ex.getStatusText());
             return ResponseEntity.badRequest().body("Kakao API Bad Request: " + ex.getStatusCode() + " " + ex.getStatusText());
         } catch (Exception ex) {
