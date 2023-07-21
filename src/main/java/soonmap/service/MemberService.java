@@ -106,7 +106,8 @@ public class MemberService implements UserDetailsService {
                 .isAdmin(false)
                 .isWriter(false)
                 .userCreateAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
-                .build());
+                .build();
+        return memberRepository.save(member);
     }
 
     public List<Member> findAll() {
@@ -125,6 +126,7 @@ public class MemberService implements UserDetailsService {
                 .snsId(kakaoMemberResponse.getSnsId()) // kakaoId는 Long으로 반환을 받아야돼서 toString 메소드를 이용해 string으로 변경하였습니다.
                 .isBan(false)
                 .isAdmin(false)
+                .isWriter(false)
                 .build();
         return memberRepository.save(member);
     }

@@ -40,7 +40,8 @@ public class AdminController {
         }
 
         String userEmail = claims.get("userEmail", String.class);
-        Member member = memberService.findUserByEmail(userEmail);
+        Member member = memberService.findUserByEmail(userEmail)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "잘못된 요청입니다."));
 
         if (memberService.getAdminRefreshToken(member.getId()) == null) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 요청입니다.");
