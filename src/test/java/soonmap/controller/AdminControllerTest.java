@@ -38,6 +38,7 @@ import soonmap.service.MemberService;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 //@WebMvcTest(AdminController.class)
 @WebMvcTest(controllers = AdminController.class,
@@ -151,7 +152,7 @@ public class AdminControllerTest {
         claims.put("userEmail", "test@email.com");
 
         given(jwtProvider.decodeJwtToken("REFRESH_TOKEN")).willReturn(claims);
-        given(memberService.findUserByEmail("test@email.com")).willReturn(member);
+        given(memberService.findUserByEmail("test@email.com")).willReturn(Optional.of(member));
         given(memberService.getAdminRefreshToken(member.getId())).willReturn("REFRESH_TOKEN");
         given(jwtProvider.createAccessToken("test@email.com")).willReturn("ACCESS_TOKEN");
 
