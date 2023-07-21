@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 import soonmap.entity.Member;
 import soonmap.exception.CustomException;
 import soonmap.repository.MemberRepository;
@@ -16,8 +17,8 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtProvider {
 
-    @Value("${JWT_SECRET_KET}")
-    private String JWT_SECRET_KET;
+    @Value("${JWT_SECRET_KEY}")
+    private String JWT_SECRET_KEY;
 
     private final Long accessTokenValidTime = 1000 * 60L * 5L; // 5분
     private final Long refreshTokenValidTime = 1000 * 60 * 60 * 24 * 7L; // 1주
@@ -33,7 +34,7 @@ public class JwtProvider {
                 .setClaims(claims)
                 .setIssuedAt(currentTime)
                 .setExpiration(new Date(currentTime.getTime() + accessTokenValidTime))
-                .signWith(SignatureAlgorithm.HS256, JWT_SECRET_KET)
+                .signWith(SignatureAlgorithm.HS256, Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
                 .compact();
     }
 
@@ -46,22 +47,9 @@ public class JwtProvider {
                 .setClaims(claims)
                 .setIssuedAt(currentTime)
                 .setExpiration(new Date(currentTime.getTime() + refreshTokenValidTime))
-                .signWith(SignatureAlgorithm.HS256, JWT_SECRET_KET)
+                .signWith(SignatureAlgorithm.HS256, Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
                 .compact();
     }
-
-//    public String createToken(String email, String TokenType, Long Token_Expire_Time) {
-//        Claims claims = Jwts.claims().setSubject("access_token");
-//        claims.put("userEmail", email);
-//        Date currentTime = new Date();
-//
-//        return Jwts.builder()
-//                .setClaims(claims)
-//                .setIssuedAt(currentTime)
-//                .setExpiration(new Date(currentTime.getTime() + Token_Expire_Time))
-//                .signWith(SignatureAlgorithm.HS256, JWT_SECRET_KET)
-//                .compact();
-//    }
 
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
         String Email = getEmailFromToken(token);
@@ -73,14 +61,19 @@ public class JwtProvider {
     }
 
     public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(JWT_SECRET_KET).build().parseClaimsJws(token).getBody()
+        return Jwts.parserBuilder()
+                .setSigningKey(Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
+                .build().parseClaimsJws(token)
+                .getBody()
                 .get("userEmail",
                         String.class);
     }
 
     public Boolean validateAccessToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(JWT_SECRET_KET).build()
+            Jwts.parserBuilder()
+                    .setSigningKey(Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
+                    .build()
                     .parseClaimsJws(token).getBody();
 
             return true;
@@ -91,7 +84,7 @@ public class JwtProvider {
 
     public Claims decodeJwtToken(String token) {
         try {
-            Claims claim = Jwts.parserBuilder().setSigningKey(JWT_SECRET_KET).build()
+            Claims claim = Jwts.parserBuilder().setSigningKey(Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes())).build()
                     .parseClaimsJws(token).getBody();
             return claim;
         } catch (SecurityException | MalformedJwtException | ExpiredJwtException

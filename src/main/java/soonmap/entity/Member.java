@@ -1,60 +1,79 @@
 package soonmap.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member implements UserDetails {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private Long id;
 
+    @Column
     private String userEmail;
 
+    @Column
     private String userName;
 
+    @Column
+    private String userPassword;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
+    @Column
     private boolean isBan;
 
+    @Column
     private boolean isAdmin;
 
+    @Column
+    private boolean isWriter;
+
+    @Column
     private String snsId;
+
+    @Column
+    private LocalDateTime userCreateAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        if (isAdmin) {
+        if (this.isAdmin) {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+        if (this.isWriter) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_WRITER"));
         }
         return authorities;
     }
 
     @Override
     public String getPassword() {
-        return null;
+        return this.userPassword;
     }
 
     @Override
     public String getUsername() {
-        return this.userEmail;
+        return this.userName;
     }
 
     @Override
@@ -70,6 +89,14 @@ public class Member implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return this.isBan;
+    }
+
+    public String getUserEmail() {
+        return this.userEmail;
+    }
+
+    public boolean isAdmin() {
+        return this.isAdmin;
     }
 
     @Override
