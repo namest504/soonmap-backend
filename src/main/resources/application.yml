@@ -13,6 +13,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
+        ddl-auto: create
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         show_sql: true
@@ -31,5 +32,6 @@ spring:
     profile-api-url: https://kapi.kakao.com/v2/user/me
     client_secret: ${KAKAO_CLIENT_SECRET}
 
-JWT_SECRET_KET: ${JWT_SECRET_KET}
+
+JWT_SECRET_KEY: ${JWT_SECRET_KEY}
 REDIS_ENDPOINT: ${REDIS_ENDPOINT}
