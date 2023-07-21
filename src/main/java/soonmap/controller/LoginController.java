@@ -60,7 +60,7 @@ public class LoginController {
             String name = apiResult.getNickname();
 
             // Member의 존재 여부에 따라 사용자 저장 여부 결정
-            Optional<Member> member = Optional.ofNullable(memberService.findUserByEmail(email));
+            Optional<Member> member = memberService.findUserBySnsId(id);
             if (member.isEmpty()) {
                 NaverMemberResponse naverMemberResponse = new NaverMemberResponse(name, email, AccountType.NAVER, id);
                 memberService.saveUser_naver(naverMemberResponse);
@@ -103,7 +103,7 @@ public class LoginController {
             String email = userInfo.getEmail();
 
             // Member의 존재 여부에 따라 사용자 저장 여부 결정
-            Optional<Member> member = Optional.ofNullable(memberService.findUserByEmail(email));
+            Optional<Member> member = memberService.findUserBySnsId(id);
             if (member.isEmpty()) {
                 KakaoMemberResponse kakaoMemberResponse = new KakaoMemberResponse(name, email, AccountType.KAKAO, id);
                 memberService.saveUser_kakao(kakaoMemberResponse);

@@ -51,9 +51,12 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findMemberById(id);
     }
 
-    public Member findUserByEmail(String email) {
-        return memberRepository.findMemberByUserEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    public Optional<Member> findUserByEmail(String email) {
+        return memberRepository.findMemberByUserEmail(email);
+
+    }
+    public Optional<Member> findUserBySnsId(String sns_id) {
+        return memberRepository.findBySnsId(sns_id);
     }
 
     public ResponseCookie createHttpOnlyCookie(TokenDto tokenDto) {
