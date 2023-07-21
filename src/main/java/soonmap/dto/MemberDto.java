@@ -84,5 +84,15 @@ public class MemberDto {
         private AccountType accountType;
         private String snsId; // naver 사용자마다 발급받는 개인식별 코드 ex) 주민등록번호
     }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class KakaoMemberResponse {
+        private String userName;
+        private String userEmail;
+        private AccountType accountType;
+        private String snsId; // naver 사용자마다 발급받는 개인식별 코드 ex) 주민등록번호
+    }
 }
 
