@@ -131,9 +131,9 @@ public class MemberService implements UserDetailsService {
         return memberRepository.save(member);
     }
 
-    public Optional<Member> findUserById(String id) {
-        return memberRepository.findMemberById(id);
-    }
+//    public Optional<Member> findUserById(String id) {
+//        return memberRepository.findMemberById(id);
+//    }
 
     public Optional<Member> findUserByEmail(String email) {
         return memberRepository.findMemberByUserEmail(email);
