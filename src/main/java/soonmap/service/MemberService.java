@@ -59,13 +59,10 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findBySnsId(sns_id);
     }
 
-    public ResponseCookie createHttpOnlyCookie(TokenDto tokenDto) {
+    public ResponseCookie createHttpOnlyCookie(String refreshToken) {
         //HTTPONLY 쿠키에 RefreshToken 생성후 전달
-        String refreshToken = tokenDto.getRefreshToken();
-        String accessToken = tokenDto.getAccessToken();
-        String cookieValue = refreshToken + "|" + accessToken;
 
-        ResponseCookie responseCookie = ResponseCookie.from("tokens", cookieValue)
+        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")

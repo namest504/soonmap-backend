@@ -72,12 +72,12 @@ public class LoginController {
             String AccessToken = jwtProvider.createAccessToken(email);
             String RefreshToken = jwtProvider.createRefreshToken(email);
 
-            TokenDto tokenDto = new TokenDto(AccessToken, RefreshToken);
+            ResponseCookie responseCookie = memberService.createHttpOnlyCookie(RefreshToken);
 
-            ResponseCookie responseCookie = memberService.createHttpOnlyCookie(tokenDto);
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                    .body("Name: " + name + ", Email: " + email+ ", id: " + id);
+                    .header("accessToken", AccessToken)
+                    .body("Name: " + name + ", Email: " + email + ", id: " + id);
         } catch (IOException e) {
             // 예외 처리
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get user profile.");
@@ -115,12 +115,12 @@ public class LoginController {
             String AccessToken = jwtProvider.createAccessToken(email);
             String RefreshToken = jwtProvider.createRefreshToken(email);
 
-            TokenDto tokenDto = new TokenDto(AccessToken, RefreshToken);
-            ResponseCookie responseCookie = memberService.createHttpOnlyCookie(tokenDto);
+            ResponseCookie responseCookie = memberService.createHttpOnlyCookie(RefreshToken);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                    .body("Name: " + name + ", Email: " + email + ", id: " + id + ", AccessToken: " + tokenDto.getAccessToken() + ", RefreshToken: " + tokenDto.getRefreshToken());
+                    .header("accessToken", AccessToken)
+                    .body("Name: " + name + ", Email: " + email + ", id: " + id);
 
         } catch (HttpClientErrorException.BadRequest ex) {
             // HttpClientErrorException$BadRequest 처리
