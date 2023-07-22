@@ -52,7 +52,8 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(authenticationFilter, JwtAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/**").permitAll();
+                .antMatchers("/**").permitAll()
+                .anyRequest().authenticated();
 
         return http.build();
     }
