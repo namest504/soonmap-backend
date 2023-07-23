@@ -60,15 +60,6 @@ public class JwtProvider {
                 member.getAuthorities());
     }
 
-//    public String getEmailFromToken(String token) {
-//        return Jwts.parserBuilder()
-//                .setSigningKey(Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
-//                .build().parseClaimsJws(token)
-//                .getBody()
-//                .get("userEmail",
-//                        String.class);
-//    }
-
     public Long getUidFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
