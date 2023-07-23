@@ -101,8 +101,8 @@ public class AdminControllerTest {
     void successAdminLogin() throws Exception {
         // given
         given(memberService.loginAdmin(any())).willReturn(member);
-        given(jwtProvider.createAccessToken("test@email.com")).willReturn("ACCESS_TOKEN");
-        given(jwtProvider.createRefreshToken("test@email.com")).willReturn("REFRESH_TOKEN");
+        given(jwtProvider.createAccessToken(any())).willReturn("ACCESS_TOKEN");
+        given(jwtProvider.createRefreshToken(any())).willReturn("REFRESH_TOKEN");
 
         // when
         ResultActions resultActions = mockMvc.perform(post("/admin/login")
@@ -149,12 +149,12 @@ public class AdminControllerTest {
     void successRefreshAdminToken() throws Exception {
         // given
         claims.setSubject("refresh_token");
-        claims.put("userEmail", "test@email.com");
+        claims.put("uid", 1L);
 
         given(jwtProvider.decodeJwtToken("REFRESH_TOKEN")).willReturn(claims);
-        given(memberService.findUserByEmail("test@email.com")).willReturn(Optional.of(member));
+        given(memberService.findUserById(1L)).willReturn(member);
         given(memberService.getAdminRefreshToken(member.getId())).willReturn("REFRESH_TOKEN");
-        given(jwtProvider.createAccessToken("test@email.com")).willReturn("ACCESS_TOKEN");
+        given(jwtProvider.createAccessToken(member.getId())).willReturn("ACCESS_TOKEN");
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/admin/refresh")

@@ -25,8 +25,8 @@ public class AdminController {
     @PostMapping("/login")
     public AdminLoginResponse adminLogin(@RequestBody AdminLoginRequest adminLoginRequest) {
         Member member = memberService.loginAdmin(adminLoginRequest);
-        String accessToken = jwtProvider.createAccessToken(member.getUserEmail());
-        String refreshToken = jwtProvider.createRefreshToken(member.getUserEmail());
+        String accessToken = jwtProvider.createAccessToken(member.getId());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId());
         memberService.saveAdminRefreshToken(member.getId(), refreshToken);
         return new AdminLoginResponse(true, member.isAdmin(), member.isWriter(), accessToken, refreshToken);
     }
@@ -39,15 +39,14 @@ public class AdminController {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 요청입니다.");
         }
 
-        String userEmail = claims.get("userEmail", String.class);
-        Member member = memberService.findUserByEmail(userEmail)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "잘못된 요청입니다."));
+        Long uid = claims.get("uid", Long.class);
+        Member member = memberService.findUserById(uid);
 
         if (memberService.getAdminRefreshToken(member.getId()) == null) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 요청입니다.");
         }
 
-        String accessToken = jwtProvider.createAccessToken(userEmail);
+        String accessToken = jwtProvider.createAccessToken(uid);
         return accessToken;
     }
 

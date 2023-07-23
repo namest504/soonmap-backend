@@ -115,7 +115,8 @@ public class MemberService implements UserDetailsService {
     }
 
     public Member findUserById(Long id) {
-        return memberRepository.findMemberById(id).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
+        return memberRepository.findMemberById(id)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
     }
 
     public Member saveUser_kakao(KakaoMemberResponse kakaoMemberResponse) {

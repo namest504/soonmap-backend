@@ -18,6 +18,7 @@ import soonmap.dto.SocialUserInfoDto;
 import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
+import soonmap.exception.CustomException;
 import soonmap.security.jwt.JwtProvider;
 
 import soonmap.security.oauth.KakaoLoginBO;
@@ -69,8 +70,8 @@ public class LoginController {
             log.info("새 유저입니다.");
 
             //AccessToken과 RefreshToken 분리 생성
-            String AccessToken = jwtProvider.createAccessToken(email);
-            String RefreshToken = jwtProvider.createRefreshToken(email);
+            String AccessToken = jwtProvider.createAccessToken(member.get().getId());
+            String RefreshToken = jwtProvider.createRefreshToken(member.get().getId());
 
             ResponseCookie responseCookie = memberService.createHttpOnlyCookie(RefreshToken);
 
@@ -112,8 +113,8 @@ public class LoginController {
             log.info("새 유저입니다.");
 
             //AccessToken과 RefreshToken 분리 생성
-            String AccessToken = jwtProvider.createAccessToken(email);
-            String RefreshToken = jwtProvider.createRefreshToken(email);
+            String AccessToken = jwtProvider.createAccessToken(member.get().getId());
+            String RefreshToken = jwtProvider.createRefreshToken(member.get().getId());
 
             ResponseCookie responseCookie = memberService.createHttpOnlyCookie(RefreshToken);
 
