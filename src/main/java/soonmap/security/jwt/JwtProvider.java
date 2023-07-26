@@ -25,9 +25,9 @@ public class JwtProvider {
 
     private final MemberRepository memberRepository;
 
-    public String createAccessToken(String email) {
+    public String createAccessToken(Long uid) {
         Claims claims = Jwts.claims().setSubject("access_token");
-        claims.put("userEmail", email);
+        claims.put("uid", uid);
         Date currentTime = new Date();
 
         return Jwts.builder()
@@ -38,9 +38,9 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String createRefreshToken(String email) {
+    public String createRefreshToken(Long uid) {
         Claims claims = Jwts.claims().setSubject("refresh_token");
-        claims.put("userEmail", email);
+        claims.put("uid", uid);
         Date currentTime = new Date();
 
         return Jwts.builder()
@@ -52,21 +52,21 @@ public class JwtProvider {
     }
 
     public UsernamePasswordAuthenticationToken getAuthentication(String token) {
-        String Email = getEmailFromToken(token);
-        Member member = memberRepository.findMemberByUserEmail(Email)
+        Long uid = getUidFromToken(token);
+        Member member = memberRepository.findMemberById(uid)
                 .orElseThrow(() -> new RuntimeException("Member 를 찾지 못했습니다."));
         MemberPrincipal memberPrincipal = new MemberPrincipal(member);
         return new UsernamePasswordAuthenticationToken(memberPrincipal, token,
                 member.getAuthorities());
     }
 
-    public String getEmailFromToken(String token) {
+    public Long getUidFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
                 .build().parseClaimsJws(token)
                 .getBody()
-                .get("userEmail",
-                        String.class);
+                .get("uid",
+                        Long.class);
     }
 
     public Boolean validateAccessToken(String token) {

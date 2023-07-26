@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class JwtProviderTest {
 
     private static final String JWT_SECRET_KEY = "tempkeytempkeytempkeytempkeytempkeytempkeytempkeytempkey";
-    private static final String USER_EMAIL = "tester@example.com";
+    private static final Long USER_ID = 1L;
 
     @InjectMocks
     private JwtProvider jwtProvider;
@@ -40,7 +40,7 @@ class JwtProviderTest {
     @Test
     void createAccessTokenTest() {
         // given
-        String accessToken = jwtProvider.createAccessToken(USER_EMAIL);
+        String accessToken = jwtProvider.createAccessToken(1L);
         // when
 
         // then
@@ -52,13 +52,14 @@ class JwtProviderTest {
                 .getBody();
 
         assertEquals("access_token", claims.getSubject());
-        assertEquals(USER_EMAIL, claims.get("userEmail"));
+        assertEquals(USER_ID, claims.get("uid", Long.class));
+//        assertEquals(USER_ID, claims.get("uid"));
     }
 
     @Test
     void createRefreshToken() {
         // given
-        String refreshToken = jwtProvider.createRefreshToken(USER_EMAIL);
+        String refreshToken = jwtProvider.createRefreshToken(1L);
         // when
 
         // then
@@ -70,14 +71,14 @@ class JwtProviderTest {
                 .getBody();
 
         assertEquals("refresh_token", claims.getSubject());
-        assertEquals(USER_EMAIL, claims.get("userEmail"));
+        assertEquals(USER_ID, claims.get("uid", Long.class));
     }
     @Test
     void getAuthenticationTest() {
         // given
-        String accessToken = jwtProvider.createAccessToken(USER_EMAIL);
+        String accessToken = jwtProvider.createAccessToken(1L);
         Member member = mock(Member.class);
-        when(memberRepository.findMemberByUserEmail(USER_EMAIL)).thenReturn(Optional.of(member));
+        when(memberRepository.findMemberById(USER_ID)).thenReturn(Optional.of(member));
 
         // when
         UsernamePasswordAuthenticationToken authentication = jwtProvider.getAuthentication(accessToken);
@@ -90,19 +91,19 @@ class JwtProviderTest {
     @Test
     void getEmailFromTokenTest() {
         // given
-        String accessToken = jwtProvider.createAccessToken(USER_EMAIL);
+        String accessToken = jwtProvider.createAccessToken(USER_ID);
 
         // when
-        String email = jwtProvider.getEmailFromToken(accessToken);
+        Long uid = jwtProvider.getUidFromToken(accessToken);
 
         // then
-        assertEquals(USER_EMAIL, email);
+        assertEquals(USER_ID, uid);
     }
 
     @Test
     void validateAccessTokenTest() {
         // given
-        String accessToken = jwtProvider.createAccessToken(USER_EMAIL);
+        String accessToken = jwtProvider.createAccessToken(USER_ID);
 
         // when
         boolean isValid = jwtProvider.validateAccessToken(accessToken);
@@ -123,14 +124,14 @@ class JwtProviderTest {
     @Test
     void decodeJwtTokenTest() {
         // given
-        String accessToken = jwtProvider.createAccessToken(USER_EMAIL);
+        String accessToken = jwtProvider.createAccessToken(USER_ID);
 
         // when
         Claims claims = jwtProvider.decodeJwtToken(accessToken);
 
         // then
         assertEquals("access_token", claims.getSubject());
-        assertEquals(USER_EMAIL, claims.get("userEmail"));
+        assertEquals(USER_ID, claims.get("uid", Long.class));
     }
 
     @Test

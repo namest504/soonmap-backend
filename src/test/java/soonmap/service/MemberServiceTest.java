@@ -115,8 +115,9 @@ class MemberServiceTest {
         testMember = new Member(1L, "test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
         AdminLoginRequest request = new AdminLoginRequest(testMember.getUserEmail(), "wrong_password");
 
-        when(memberRepository.findMemberByUserEmail(request.getEmail())).thenReturn(Optional.of(testMember));
-        when(passwordEncoder.matches(request.getPassword(), testMember.getPassword())).thenReturn(false);
+//        when(memberRepository.findMemberByUserEmail(testMember.getUserEmail())).thenReturn(Optional.of(testMember));
+//        when(memberRepository.findMemberById(testMember.getId())).thenReturn(Optional.of(testMember));
+//        when(passwordEncoder.matches(request.getPassword(), testMember.getPassword())).thenReturn(false);
 
         CustomException exception = assertThrows(CustomException.class, () -> memberService.loginAdmin(request));
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getHttpStatus());

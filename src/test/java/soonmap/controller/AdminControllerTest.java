@@ -1,10 +1,9 @@
 package soonmap.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -22,7 +21,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,6 +36,7 @@ import soonmap.exception.CustomException;
 import soonmap.security.jwt.JwtProvider;
 import soonmap.service.MemberService;
 
+import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -101,9 +103,18 @@ public class AdminControllerTest {
     void successAdminLogin() throws Exception {
         // given
         given(memberService.loginAdmin(any())).willReturn(member);
-        given(jwtProvider.createAccessToken("test@email.com")).willReturn("ACCESS_TOKEN");
-        given(jwtProvider.createRefreshToken("test@email.com")).willReturn("REFRESH_TOKEN");
+        given(jwtProvider.createAccessToken(any())).willReturn("ACCESS_TOKEN");
+        given(jwtProvider.createRefreshToken(any())).willReturn("REFRESH_TOKEN");
 
+        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", "REFRESH_TOKEN")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(3600000)
+                .build();
+
+        given(memberService.createHttpOnlyCookie(any())).willReturn(responseCookie);
         // when
         ResultActions resultActions = mockMvc.perform(post("/admin/login")
                 .contentType("application/json")
@@ -113,11 +124,14 @@ public class AdminControllerTest {
         // then
         resultActions
                 .andExpect(status().isOk())
+                .andExpect(result -> {
+                    String setCookieValue = result.getResponse().getHeader(HttpHeaders.SET_COOKIE);
+                    assertThat(setCookieValue).contains(responseCookie.getValue());
+                })
+                .andExpect(header().string("accessToken", "ACCESS_TOKEN"))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.admin").value(true))
                 .andExpect(jsonPath("$.writer").value(true))
-                .andExpect(jsonPath("$.accessToken").value("ACCESS_TOKEN"))
-                .andExpect(jsonPath("$.refreshToken").value("REFRESH_TOKEN"))
                 .andDo(print());
     }
 
@@ -149,21 +163,23 @@ public class AdminControllerTest {
     void successRefreshAdminToken() throws Exception {
         // given
         claims.setSubject("refresh_token");
-        claims.put("userEmail", "test@email.com");
+        claims.put("uid", 1L);
 
         given(jwtProvider.decodeJwtToken("REFRESH_TOKEN")).willReturn(claims);
-        given(memberService.findUserByEmail("test@email.com")).willReturn(Optional.of(member));
+        given(memberService.findUserById(1L)).willReturn(member);
         given(memberService.getAdminRefreshToken(member.getId())).willReturn("REFRESH_TOKEN");
-        given(jwtProvider.createAccessToken("test@email.com")).willReturn("ACCESS_TOKEN");
+        given(jwtProvider.createAccessToken(member.getId())).willReturn("ACCESS_TOKEN");
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", "REFRESH_TOKEN");
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/admin/refresh")
-                        .param("token", "REFRESH_TOKEN"));
+                .cookie(refreshTokenCookie));
 
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("ACCESS_TOKEN"))
+                .andExpect(content().string("true"))
                 .andDo(print());
     }
 
