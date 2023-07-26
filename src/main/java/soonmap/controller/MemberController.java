@@ -4,20 +4,16 @@ package soonmap.controller;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
-import soonmap.dto.MemberDto;
 
 import soonmap.dto.SocialUserInfoDto;
-import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
-import soonmap.exception.CustomException;
 import soonmap.security.jwt.JwtProvider;
 
 import soonmap.security.oauth.KakaoLoginBO;
@@ -35,7 +31,7 @@ import static soonmap.dto.MemberDto.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class LoginController {
+public class MemberController {
 
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
