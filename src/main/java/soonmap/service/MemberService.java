@@ -10,10 +10,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import soonmap.dto.MemberDto;
 import soonmap.dto.MemberDto.AdminLoginRequest;
 import soonmap.dto.MemberDto.AdminResisterRequest;
-import soonmap.dto.MemberDto.NaverMemberResponse;
-import soonmap.dto.MemberDto.KakaoMemberResponse;
+
 import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
@@ -26,6 +26,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+
+import static soonmap.dto.MemberDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -96,12 +98,12 @@ public class MemberService implements UserDetailsService {
                 .build());
     }
 
-    public Member saveUser_naver(NaverMemberResponse naverMemberResponse) {
+    public Member SocialsaveUser(SocialMemberResponse socialMemberResponse) {
         Member member = Member.builder()
-                .userName(naverMemberResponse.getUserName())
-                .userEmail(naverMemberResponse.getUserEmail())
-                .accountType(naverMemberResponse.getAccountType())
-                .snsId(naverMemberResponse.getSnsId())
+                .userName(socialMemberResponse.getUserName())
+                .userEmail(socialMemberResponse.getUserEmail())
+                .accountType(socialMemberResponse.getAccountType())
+                .snsId(socialMemberResponse.getSnsId())
                 .isBan(false)
                 .isAdmin(false)
                 .isWriter(false)
@@ -119,18 +121,7 @@ public class MemberService implements UserDetailsService {
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
     }
 
-    public Member saveUser_kakao(KakaoMemberResponse kakaoMemberResponse) {
-        Member member = Member.builder()
-                .userName(kakaoMemberResponse.getUserName())
-                .userEmail(kakaoMemberResponse.getUserEmail())
-                .accountType(kakaoMemberResponse.getAccountType())
-                .snsId(kakaoMemberResponse.getSnsId()) // kakaoId는 Long으로 반환을 받아야돼서 toString 메소드를 이용해 string으로 변경하였습니다.
-                .isBan(false)
-                .isAdmin(false)
-                .isWriter(false)
-                .build();
-        return memberRepository.save(member);
-    }
+
 
 //    public Optional<Member> findUserById(String id) {
 //        return memberRepository.findMemberById(id);

@@ -54,7 +54,6 @@ public class KakaoLoginBO {
 
         // 전달받은 액세스 토큰을 이용하여 OAuth2AccessToken 생성
 
-
         // 프로필 API 호출
         OAuthRequest request = new OAuthRequest(Verb.POST, PROFILE_API_URL, oAuth20Service);
         oAuth20Service.signRequest(accessToken, request);

@@ -76,17 +76,7 @@ public class MemberDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class NaverMemberResponse {
-        private String userName;
-        private String userEmail;
-        private AccountType accountType;
-        private String snsId; // naver 사용자마다 발급받는 개인식별 코드 ex) 주민등록번호
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class KakaoMemberResponse {
+    public static class SocialMemberResponse {
         private String userName;
         private String userEmail;
         private AccountType accountType;

@@ -12,8 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import soonmap.dto.MemberDto;
-import soonmap.dto.MemberDto.NaverMemberResponse;
-import soonmap.dto.MemberDto.KakaoMemberResponse;
+
 import soonmap.dto.SocialUserInfoDto;
 import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
@@ -27,6 +26,8 @@ import soonmap.service.MemberService;
 
 import java.io.IOException;
 import java.util.Optional;
+
+import static soonmap.dto.MemberDto.*;
 
 /**
  * Handles requests for the application home page.
@@ -63,8 +64,8 @@ public class LoginController {
             // Member의 존재 여부에 따라 사용자 저장 여부 결정
             Optional<Member> member = memberService.findUserBySnsId(id);
             if (member.isEmpty()) {
-                NaverMemberResponse naverMemberResponse = new NaverMemberResponse(name, email, AccountType.NAVER, id);
-                memberService.saveUser_naver(naverMemberResponse);
+                SocialMemberResponse naverMemberResponse = new SocialMemberResponse(name, email, AccountType.NAVER, id);
+                memberService.SocialsaveUser(naverMemberResponse);
                 log.info("이미 있는 유저입니다.");
             }
             log.info("새 유저입니다.");
@@ -106,8 +107,8 @@ public class LoginController {
             // Member의 존재 여부에 따라 사용자 저장 여부 결정
             Optional<Member> member = memberService.findUserBySnsId(id);
             if (member.isEmpty()) {
-                KakaoMemberResponse kakaoMemberResponse = new KakaoMemberResponse(name, email, AccountType.KAKAO, id);
-                memberService.saveUser_kakao(kakaoMemberResponse);
+                SocialMemberResponse kakaoMemberResponse = new SocialMemberResponse(name, email, AccountType.KAKAO, id);
+                memberService.SocialsaveUser(kakaoMemberResponse);
                 log.info("이미 있는 유저입니다.");
             }
             log.info("새 유저입니다.");
