@@ -1,9 +1,16 @@
 package soonmap.entity;
 
+import lombok.*;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Article {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,10 +21,10 @@ public class Article {
     private String title;
 
     @Column
-    private String articleContent;
+    private String content;
 
     @Column
-    private LocalDateTime articleCreateAt;
+    private LocalDateTime createAt;
 
     @OneToOne(fetch = FetchType.LAZY)
     private Member member;
