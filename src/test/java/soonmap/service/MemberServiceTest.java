@@ -74,25 +74,25 @@ class MemberServiceTest {
 
     @Test
     public void adminLogin_Success() {
-        testMember = new Member(1L, "test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
+        testMember = new Member(1L, "testid1","test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true,true, "testSnsId", LocalDateTime.now());
         AdminLoginRequest request = new AdminLoginRequest(testMember.getUserEmail(), "test_password");
 
-        when(memberRepository.findMemberByUserEmail(request.getEmail())).thenReturn(Optional.of(testMember));
+        when(memberRepository.findMemberByUserId(request.getUserId())).thenReturn(Optional.of(testMember));
         when(passwordEncoder.matches(any(),any())).thenReturn(true);
 
         Member result = memberService.loginAdmin(request);
 
         assertEquals(testMember, result);
-        verify(memberRepository, times(1)).findMemberByUserEmail(request.getEmail());
-        verify(passwordEncoder, times(1)).matches(request.getPassword(), testMember.getPassword());
+        verify(memberRepository, times(1)).findMemberByUserId(request.getUserId());
+        verify(passwordEncoder, times(1)).matches(request.getUserPw(), testMember.getPassword());
     }
 
     @Test
     public void adminLogin_ForbiddenUserInfo() {
-        testMember = new Member(1L, "forbidden@email.com", "test", "testPassword", AccountType.ADMIN, true, true, true, "testSnsId", LocalDateTime.now());
+        testMember = new Member(1L, "testid1","forbidden@email.com", "test", "testPassword", AccountType.ADMIN, true, true, true,true, "testSnsId", LocalDateTime.now());
         AdminLoginRequest request = new AdminLoginRequest("forbidden@email.com", "test_password");
 
-        when(memberRepository.findMemberByUserEmail(request.getEmail())).thenReturn(Optional.of(testMember));
+        when(memberRepository.findMemberByUserId(request.getUserId())).thenReturn(Optional.of(testMember));
 
         CustomException exception = assertThrows(CustomException.class, () -> memberService.loginAdmin(request));
         assertEquals(HttpStatus.FORBIDDEN, exception.getHttpStatus());
@@ -103,7 +103,7 @@ class MemberServiceTest {
     public void adminLogin_InvalidUserInfo() {
         AdminLoginRequest request = new AdminLoginRequest("invalid@email.com", "test_password");
 
-        when(memberRepository.findMemberByUserEmail(request.getEmail())).thenReturn(Optional.empty());
+        when(memberRepository.findMemberByUserId(request.getUserId())).thenReturn(Optional.empty());
 
         CustomException exception = assertThrows(CustomException.class, () -> memberService.loginAdmin(request));
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getHttpStatus());
@@ -112,7 +112,7 @@ class MemberServiceTest {
 
     @Test
     public void adminLogin_WrongPassword() {
-        testMember = new Member(1L, "test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
+        testMember = new Member(1L, "testid1","test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true,true, "testSnsId", LocalDateTime.now());
         AdminLoginRequest request = new AdminLoginRequest(testMember.getUserEmail(), "wrong_password");
 
 //        when(memberRepository.findMemberByUserEmail(testMember.getUserEmail())).thenReturn(Optional.of(testMember));
@@ -126,11 +126,11 @@ class MemberServiceTest {
 
     @Test
     public void adminLogin_InvalidUserType() {
-        Member invalidMember = new Member(1L, "test@email.com", "test", "testPassword", AccountType.ADMIN, false, false, false, "testSnsId", LocalDateTime.now());
+        Member invalidMember = new Member(1L,"testid1", "test@email.com", "test", "testPassword", AccountType.ADMIN, false, false, false,false, "testSnsId", LocalDateTime.now());
         AdminLoginRequest request = new AdminLoginRequest(invalidMember.getUserEmail(), "test_password");
 
-        when(memberRepository.findMemberByUserEmail(request.getEmail())).thenReturn(Optional.of(invalidMember));
-        when(passwordEncoder.matches(request.getPassword(), invalidMember.getPassword())).thenReturn(true);
+        when(memberRepository.findMemberByUserId(request.getUserId())).thenReturn(Optional.of(invalidMember));
+        when(passwordEncoder.matches(request.getUserPw(), invalidMember.getPassword())).thenReturn(true);
 
         CustomException exception = assertThrows(CustomException.class, () -> memberService.loginAdmin(request));
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getHttpStatus());
