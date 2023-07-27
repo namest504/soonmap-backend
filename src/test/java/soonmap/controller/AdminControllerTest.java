@@ -34,7 +34,7 @@ import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.exception.CustomException;
 import soonmap.security.jwt.JwtProvider;
-import soonmap.service.MemberService;
+import soonmap.service.*;
 
 import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
@@ -62,6 +62,19 @@ public class AdminControllerTest {
     @MockBean
     JwtProvider jwtProvider;
 
+    @MockBean
+    S3Service s3Service;
+
+    @MockBean
+    NoticeService noticeService;
+
+    @MockBean
+    ArticleService articleService;
+
+    @MockBean
+    ArticleTypeService articleTypeService;
+
+
 //    @MockBean
 //    MemberPrincipal memberPrincipal;
 
@@ -72,7 +85,7 @@ public class AdminControllerTest {
     @BeforeEach
     public void setUp() {
         adminLoginRequest = new AdminLoginRequest("test@email.com", "testPassword");
-        member = new Member(1L, "test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
+        member = new Member(1L, "testid1", "test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
         claims = Jwts.claims();
     }
 
@@ -131,7 +144,8 @@ public class AdminControllerTest {
                 .andExpect(header().string("accessToken", "ACCESS_TOKEN"))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.admin").value(true))
-                .andExpect(jsonPath("$.writer").value(true))
+                .andExpect(jsonPath("$.manager").value(true))
+                .andExpect(jsonPath("$.staff").value(true))
                 .andDo(print());
     }
 
@@ -140,7 +154,7 @@ public class AdminControllerTest {
     @DisplayName("어드민 인증 받기 전 로그인 실패 테스트")
     void forbiddenAdminLogin() throws Exception {
         // given
-        Member forbiddenMember = new Member(1L, "test@email.com", "test", "testPassword", AccountType.ADMIN, true, true, true, "testSnsId", LocalDateTime.now());
+        Member forbiddenMember = new Member(1L, "testid1", "test@email.com", "test", "testPassword", AccountType.ADMIN, true, true, true, true, "testSnsId", LocalDateTime.now());
         given(memberService.loginAdmin(any())).willThrow(new CustomException(HttpStatus.FORBIDDEN, "접근이 제한되었습니다."));
 
         // when
@@ -188,9 +202,9 @@ public class AdminControllerTest {
     @DisplayName("어드민 계정 조회 성공 테스트")
     void successGetAdminAccount() throws Exception {
         // given
-        Member adminAccount1 = new Member(1L, "test1@email.com", "test1", "testPassword1", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
-        Member adminAccount2 = new Member(2L, "test2@email.com", "test2", "testPassword2", AccountType.NAVER, false, false, false, "testSnsId", LocalDateTime.now());
-        Member adminAccount3 = new Member(3L, "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount1 = new Member(1L, "testid1", "test1@email.com", "test1", "testPassword1", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount2 = new Member(2L, "testid2", "test2@email.com", "test2", "testPassword2", AccountType.NAVER, false, false, false, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount3 = new Member(3L, "testid3", "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, true, "testSnsId", LocalDateTime.now());
         List<Member> memberList = Arrays.asList(adminAccount1, adminAccount3);
 
         given(memberService.findAdminAccount()).willReturn(memberList);
@@ -213,9 +227,9 @@ public class AdminControllerTest {
     @DisplayName("전체 계정 조회 성공 테스트")
     void successGetAllAccount() throws Exception {
         // given
-        Member adminAccount1 = new Member(1L, "test1@email.com", "test1", "testPassword1", AccountType.ADMIN, false, false, true, "testSnsId", LocalDateTime.now());
-        Member adminAccount2 = new Member(2L, "test2@email.com", "test2", "testPassword2", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
-        Member adminAccount3 = new Member(3L, "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount1 = new Member(1L, "testid1", "test1@email.com", "test1", "testPassword1", AccountType.ADMIN, false, false, true, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount2 = new Member(2L, "testid2", "test2@email.com", "test2", "testPassword2", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount3 = new Member(3L, "testid3", "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, true, "testSnsId", LocalDateTime.now());
         List<Member> memberList = Arrays.asList(adminAccount1, adminAccount2, adminAccount3);
 //        given(memberPrincipal.getMember().isAdmin()).willReturn(true);
         given(memberService.findAll()).willReturn(memberList);
@@ -239,9 +253,9 @@ public class AdminControllerTest {
     @DisplayName("비인가된 유저의 어드민 계정 조회 실패 테스트")
     void unauthorizedGetAdminAccount() throws Exception {
         // given
-        Member adminAccount1 = new Member(1L, "test1@email.com", "test1", "testPassword1", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
-        Member adminAccount2 = new Member(2L, "test2@email.com", "test2", "testPassword2", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
-        Member adminAccount3 = new Member(3L, "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount1 = new Member(1L, "testid1", "test1@email.com", "test1", "testPassword1", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount2 = new Member(2L, "testid2", "test2@email.com", "test2", "testPassword2", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount3 = new Member(3L, "testid3", "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, true, "testSnsId", LocalDateTime.now());
         List<Member> memberList = Arrays.asList(adminAccount1, adminAccount2, adminAccount3);
         given(memberService.findAdminAccount()).willReturn(memberList);
 
@@ -261,9 +275,9 @@ public class AdminControllerTest {
     @DisplayName("유저의 어드민 계정 조회 실패 테스트")
     void userGetAdminAccount() throws Exception {
         // given
-        Member adminAccount1 = new Member(1L, "test1@email.com", "test1", "testPassword1", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
-        Member adminAccount2 = new Member(2L, "test2@email.com", "test2", "testPassword2", AccountType.ADMIN, false, true, true, "testSnsId", LocalDateTime.now());
-        Member adminAccount3 = new Member(3L, "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount1 = new Member(1L, "testid1", "test1@email.com", "test1", "testPassword1", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount2 = new Member(2L, "testid2", "test2@email.com", "test2", "testPassword2", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
+        Member adminAccount3 = new Member(3L, "testid3", "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, true, "testSnsId", LocalDateTime.now());
         List<Member> memberList = Arrays.asList(adminAccount1, adminAccount2, adminAccount3);
         given(memberService.findAdminAccount()).willReturn(memberList);
 
