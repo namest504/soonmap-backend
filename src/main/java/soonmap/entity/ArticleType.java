@@ -1,8 +1,15 @@
 package soonmap.entity;
 
+import lombok.*;
+
 import javax.persistence.*;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ArticleType {
 
     @Id
@@ -11,5 +18,5 @@ public class ArticleType {
     private Long id;
 
     @Column
-    private String articleType;
+    private String typeName;
 }

@@ -1,10 +1,16 @@
 package soonmap.entity;
 
+import lombok.*;
+
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Notice {
 
     @Id
@@ -16,10 +22,13 @@ public class Notice {
     private String title;
 
     @Column
-    private String noticeContent;
+    private String content;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Member member;
 
     @Column
-    private LocalDateTime noticeCreateAt;
+    private LocalDateTime createAt;
 
     @Column
     private boolean isTop;

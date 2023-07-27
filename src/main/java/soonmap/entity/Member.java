@@ -26,6 +26,9 @@ public class Member implements UserDetails {
     private Long id;
 
     @Column
+    private String userId;
+
+    @Column
     private String userEmail;
 
     @Column
@@ -45,7 +48,10 @@ public class Member implements UserDetails {
     private boolean isAdmin;
 
     @Column
-    private boolean isWriter;
+    private boolean isManager;
+
+    @Column
+    private boolean isStaff;
 
     @Column
     private String snsId;
@@ -60,8 +66,11 @@ public class Member implements UserDetails {
         if (this.isAdmin) {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         }
-        if (this.isWriter) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_WRITER"));
+        if (this.isManager) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
+        }
+        if (this.isStaff) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_STAFF"));
         }
         return authorities;
     }

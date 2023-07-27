@@ -4,18 +4,14 @@ package soonmap.controller;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
-import soonmap.dto.MemberDto;
-import soonmap.dto.MemberDto.NaverMemberResponse;
-import soonmap.dto.MemberDto.KakaoMemberResponse;
+
 import soonmap.dto.SocialUserInfoDto;
-import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.security.jwt.JwtProvider;
@@ -27,13 +23,15 @@ import soonmap.service.MemberService;
 import java.io.IOException;
 import java.util.Optional;
 
+import static soonmap.dto.MemberDto.*;
+
 /**
  * Handles requests for the application home page.
  */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class LoginController {
+public class MemberController {
 
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
@@ -62,15 +60,15 @@ public class LoginController {
             // Member의 존재 여부에 따라 사용자 저장 여부 결정
             Optional<Member> member = memberService.findUserBySnsId(id);
             if (member.isEmpty()) {
-                NaverMemberResponse naverMemberResponse = new NaverMemberResponse(name, email, AccountType.NAVER, id);
-                memberService.saveUser_naver(naverMemberResponse);
+                SocialMemberResponse naverMemberResponse = new SocialMemberResponse(name, email, AccountType.NAVER, id);
+                memberService.SocialsaveUser(naverMemberResponse);
                 log.info("이미 있는 유저입니다.");
             }
             log.info("새 유저입니다.");
 
             //AccessToken과 RefreshToken 분리 생성
-            String AccessToken = jwtProvider.createAccessToken(email);
-            String RefreshToken = jwtProvider.createRefreshToken(email);
+            String AccessToken = jwtProvider.createAccessToken(member.get().getId());
+            String RefreshToken = jwtProvider.createRefreshToken(member.get().getId());
 
             ResponseCookie responseCookie = memberService.createHttpOnlyCookie(RefreshToken);
 
@@ -105,15 +103,15 @@ public class LoginController {
             // Member의 존재 여부에 따라 사용자 저장 여부 결정
             Optional<Member> member = memberService.findUserBySnsId(id);
             if (member.isEmpty()) {
-                KakaoMemberResponse kakaoMemberResponse = new KakaoMemberResponse(name, email, AccountType.KAKAO, id);
-                memberService.saveUser_kakao(kakaoMemberResponse);
+                SocialMemberResponse kakaoMemberResponse = new SocialMemberResponse(name, email, AccountType.KAKAO, id);
+                memberService.SocialsaveUser(kakaoMemberResponse);
                 log.info("이미 있는 유저입니다.");
             }
             log.info("새 유저입니다.");
 
             //AccessToken과 RefreshToken 분리 생성
-            String AccessToken = jwtProvider.createAccessToken(email);
-            String RefreshToken = jwtProvider.createRefreshToken(email);
+            String AccessToken = jwtProvider.createAccessToken(member.get().getId());
+            String RefreshToken = jwtProvider.createRefreshToken(member.get().getId());
 
             ResponseCookie responseCookie = memberService.createHttpOnlyCookie(RefreshToken);
 

@@ -16,7 +16,8 @@ public class MemberDto {
     @AllArgsConstructor
     public static class AdminResisterResponse {
         private boolean isAdmin;
-        private boolean isWriter;
+        private boolean isManager;
+        private boolean isStaff;
     }
 
     @Getter
@@ -25,8 +26,8 @@ public class MemberDto {
     @AllArgsConstructor
     public static class AdminResisterRequest {
         private String name;
-        private String email;
-        private String password;
+        private String userId;
+        private String userPw;
     }
 
     @Getter
@@ -35,9 +36,8 @@ public class MemberDto {
     public static class AdminLoginResponse {
         private boolean success;
         private boolean isAdmin;
-        private boolean isWriter;
-        private String accessToken;
-        private String refreshToken;
+        private boolean isManager;
+        private boolean isStaff;
     }
 
     @Getter
@@ -45,8 +45,8 @@ public class MemberDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AdminLoginRequest {
-        private String email;
-        private String password;
+        private String userId;
+        private String userPw;
     }
 
     @Getter
@@ -65,30 +65,21 @@ public class MemberDto {
         private String name;
         private String email;
         private boolean isAdmin;
-        private boolean isWriter;
+        private boolean isManager;
+        private boolean isStaff;
         private boolean isBan;
         private LocalDateTime createAt;
 
 
         public static Account of(Member member) {
-            return new Account(member.getId(), member.getUsername(), member.getUserEmail(), member.isAdmin(), member.isWriter(), member.isBan(), member.getUserCreateAt());
+            return new Account(member.getId(), member.getUsername(), member.getUserEmail(), member.isAdmin(), member.isManager(), member.isStaff(), member.isBan(), member.getUserCreateAt());
         }
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class NaverMemberResponse {
-        private String userName;
-        private String userEmail;
-        private AccountType accountType;
-        private String snsId; // naver 사용자마다 발급받는 개인식별 코드 ex) 주민등록번호
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class KakaoMemberResponse {
+    public static class SocialMemberResponse {
         private String userName;
         private String userEmail;
         private AccountType accountType;
