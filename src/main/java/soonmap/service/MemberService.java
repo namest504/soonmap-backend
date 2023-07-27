@@ -53,30 +53,32 @@ public class MemberService implements UserDetailsService {
     public Member addAdmin(AdminResisterRequest adminResisterRequest) {
         return memberRepository.save(Member.builder()
                 .userName(adminResisterRequest.getName())
-                .userEmail(adminResisterRequest.getEmail())
-                .userPassword(passwordEncoder.encode(adminResisterRequest.getPassword()))
+                        .userId(adminResisterRequest.getUserId())
+                .userEmail(null)
+                .userPassword(passwordEncoder.encode(adminResisterRequest.getUserPw()))
                 .accountType(AccountType.valueOf("ADMIN"))
                 .snsId(null)
                 .isBan(true)
                 .isAdmin(false)
-                .isWriter(true)
+                .isManager(false)
+                .isStaff(true)
                 .userCreateAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build());
     }
 
     public Member loginAdmin(AdminLoginRequest adminLoginRequest) {
-        Member member = memberRepository.findMemberByUserEmail(adminLoginRequest.getEmail())
+        Member member = memberRepository.findMemberByUserId(adminLoginRequest.getUserId())
                 .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 정보입니다."));
 
         if (member.isBan()) {
             throw new CustomException(HttpStatus.FORBIDDEN, "접근이 제한되었습니다.");
         }
 
-        if (!passwordEncoder.matches(adminLoginRequest.getPassword(), member.getPassword())) {
+        if (!passwordEncoder.matches(adminLoginRequest.getUserPw(), member.getPassword())) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 정보입니다.");
         }
 
-        if (member.isAdmin() || member.isWriter()) {
+        if (member.isAdmin() || member.isManager() || member.isStaff()) {
             return member;
         } else {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 정보입니다.");
@@ -93,7 +95,8 @@ public class MemberService implements UserDetailsService {
                 .snsId(member.getSnsId())
                 .isBan(member.isBan())
                 .isAdmin(member.isAdmin())
-                .isWriter(member.isWriter())
+                .isManager(member.isManager())
+                .isStaff(member.isStaff())
                 .userCreateAt(member.getUserCreateAt())
                 .build());
     }
@@ -106,7 +109,8 @@ public class MemberService implements UserDetailsService {
                 .snsId(socialMemberResponse.getSnsId())
                 .isBan(false)
                 .isAdmin(false)
-                .isWriter(false)
+                .isManager(false)
+                .isStaff(false)
                 .userCreateAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build();
         return memberRepository.save(member);
