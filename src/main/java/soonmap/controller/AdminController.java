@@ -45,7 +45,7 @@ public class AdminController {
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> adminLogin(
-            HttpServletResponse response,
+//            HttpServletResponse response,
             @RequestBody @Valid AdminLoginRequest adminLoginRequest) {
         Member member = memberService.loginAdmin(adminLoginRequest);
         String accessToken = jwtProvider.createAccessToken(member.getId());
@@ -53,11 +53,11 @@ public class AdminController {
 
         ResponseCookie responseCookie = memberService.createHttpOnlyCookie(refreshToken);
 
-        response.addHeader("accessToken", accessToken);
-
+//        response.addHeader("accessToken", accessToken);
         memberService.saveAdminRefreshToken(member.getId(), refreshToken);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .header("Access-Token", accessToken)
                 .body(new AdminLoginResponse(true, member.isAdmin(), member.isManager(), member.isStaff()));
     }
 
