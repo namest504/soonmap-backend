@@ -25,6 +25,7 @@ import soonmap.security.jwt.JwtProvider;
 import soonmap.security.jwt.MemberPrincipal;
 import soonmap.service.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -43,17 +44,20 @@ public class AdminController {
     private final ArticleTypeService articleTypeService;
 
     @PostMapping("/login")
-    public ResponseEntity<AdminLoginResponse> adminLogin(@RequestBody @Valid AdminLoginRequest adminLoginRequest) {
+    public ResponseEntity<AdminLoginResponse> adminLogin(
+            HttpServletResponse response,
+            @RequestBody @Valid AdminLoginRequest adminLoginRequest) {
         Member member = memberService.loginAdmin(adminLoginRequest);
         String accessToken = jwtProvider.createAccessToken(member.getId());
         String refreshToken = jwtProvider.createRefreshToken(member.getId());
 
         ResponseCookie responseCookie = memberService.createHttpOnlyCookie(refreshToken);
 
+        response.addHeader("accessToken", accessToken);
+
         memberService.saveAdminRefreshToken(member.getId(), refreshToken);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .header("accessToken", accessToken)
                 .body(new AdminLoginResponse(true, member.isAdmin(), member.isManager(), member.isStaff()));
     }
 
