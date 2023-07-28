@@ -151,8 +151,8 @@ public class MemberService implements UserDetailsService {
 
         ResponseCookie responseCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
+//                .secure(true)
+                .sameSite("Lax")
                 .path("/")
                 .maxAge(3600000)
                 .build();
