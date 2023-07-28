@@ -43,7 +43,7 @@ public class AdminController {
     private final ArticleTypeService articleTypeService;
 
     @PostMapping("/login")
-    public ResponseEntity<AdminLoginResponse> adminLogin(@RequestBody AdminLoginRequest adminLoginRequest) {
+    public ResponseEntity<AdminLoginResponse> adminLogin(@RequestBody @Valid AdminLoginRequest adminLoginRequest) {
         Member member = memberService.loginAdmin(adminLoginRequest);
         String accessToken = jwtProvider.createAccessToken(member.getId());
         String refreshToken = jwtProvider.createRefreshToken(member.getId());
@@ -79,7 +79,7 @@ public class AdminController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AdminResisterResponse> resisterAdmin(@RequestBody AdminResisterRequest adminResisterRequest) {
+    public ResponseEntity<AdminResisterResponse> resisterAdmin(@RequestBody @Valid AdminResisterRequest adminResisterRequest) {
 
         memberService.validateDuplicatedId(adminResisterRequest.getUserId());
 
@@ -245,7 +245,7 @@ public class AdminController {
 
         List<Article> articles = articleService.getArticles(page, length);
         List<ArticleResponse> articleResponseList = articles.stream()
-                .map(c -> ArticleResponse.of(c))
+                .map(ArticleResponse::of)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok()
@@ -263,7 +263,7 @@ public class AdminController {
 
         List<Article> articles = articleService.getMemberArticles(member, page, length);
         List<ArticleResponse> articleResponseList = articles.stream()
-                .map(c -> ArticleResponse.of(c))
+                .map(ArticleResponse::of)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok()
