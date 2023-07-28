@@ -45,6 +45,13 @@ public class MemberService implements UserDetailsService {
         return redisTemplate.opsForValue().get("RefreshToken-ADMIN-" + memberId);
     }
 
+    public void validateDuplicatedId(String id) {
+        memberRepository.findMemberByUserId(id)
+                .ifPresent( p -> {
+                    throw new CustomException(HttpStatus.BAD_REQUEST,"ID 문제");
+                });
+    }
+
     public List<Member> findAdminAccount() {
         List<Member> adminsByAccountTypeAdmin = memberRepository.findAdminsByAccountType(AccountType.ADMIN);
         return adminsByAccountTypeAdmin;
