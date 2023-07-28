@@ -16,6 +16,7 @@ public class MemberDto {
     @Setter
     @AllArgsConstructor
     public static class AdminResisterResponse {
+        private boolean success;
         private boolean isAdmin;
         private boolean isManager;
         private boolean isStaff;
