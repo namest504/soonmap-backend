@@ -141,7 +141,7 @@ public class AdminControllerTest {
                     String setCookieValue = result.getResponse().getHeader(HttpHeaders.SET_COOKIE);
                     assertThat(setCookieValue).contains(responseCookie.getValue());
                 })
-                .andExpect(header().string("accessToken", "ACCESS_TOKEN"))
+                .andExpect(header().string("Access-Token", "ACCESS_TOKEN"))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.admin").value(true))
                 .andExpect(jsonPath("$.manager").value(true))
