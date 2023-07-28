@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import soonmap.dto.ArticleDto.ArticleResponse;
 import soonmap.dto.ArticleDto.CreateArticleRequest;
 import soonmap.dto.MemberDto.*;
 import soonmap.dto.NoticeDto.CreateNoticeRequest;
@@ -236,5 +237,36 @@ public class AdminController {
 
         return ResponseEntity.ok()
                 .body(save);
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
+    @GetMapping("/article/all/{page}")
+    public ResponseEntity<?> getArticle(@PathVariable int page, @RequestParam int length) {
+
+        List<Article> articles = articleService.getArticles(page, length);
+        List<ArticleResponse> articleResponseList = articles.stream()
+                .map(c -> ArticleResponse.of(c))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok()
+                .body(articleResponseList);
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
+    @GetMapping("/article/my/{page}")
+    public ResponseEntity<?> getMemberArticle(
+            @AuthenticationPrincipal MemberPrincipal memberPrincipal,
+            @PathVariable int page,
+            @RequestParam int length) {
+
+        Member member = memberService.findUserById(memberPrincipal.getMember().getId());
+
+        List<Article> articles = articleService.getMemberArticles(member, page, length);
+        List<ArticleResponse> articleResponseList = articles.stream()
+                .map(c -> ArticleResponse.of(c))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok()
+                .body(articleResponseList);
     }
 }
