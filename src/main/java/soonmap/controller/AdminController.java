@@ -2,7 +2,6 @@ package soonmap.controller;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -10,11 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import soonmap.dto.ArticleDto.CreateArticleRequest;
 import soonmap.dto.MemberDto.*;
 import soonmap.dto.NoticeDto.CreateNoticeRequest;
 import soonmap.dto.NoticeDto.CreateNoticeResponse;
+import soonmap.dto.NoticeDto.ModifyNoticeRequest;
+import soonmap.dto.NoticeDto.ModifyNoticeResponse;
 import soonmap.entity.Article;
 import soonmap.entity.ArticleType;
 import soonmap.entity.Member;
@@ -25,7 +25,6 @@ import soonmap.security.jwt.MemberPrincipal;
 import soonmap.service.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -38,13 +37,9 @@ public class AdminController {
 
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
-    private final S3Service s3Service;
     private final NoticeService noticeService;
     private final ArticleService articleService;
     private final ArticleTypeService articleTypeService;
-
-    @Value("${CLOUD_FRONT_URL}")
-    private String CLOUD_FRONT_URL;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> adminLogin(@RequestBody AdminLoginRequest adminLoginRequest) {
@@ -84,6 +79,9 @@ public class AdminController {
 
     @PostMapping("/register")
     public ResponseEntity<AdminResisterResponse> resisterAdmin(@RequestBody AdminResisterRequest adminResisterRequest) {
+
+        memberService.validateDuplicatedId(adminResisterRequest.getUserId());
+
         Member member = memberService.addAdmin(adminResisterRequest);
         return ResponseEntity.ok()
                 .body(new AdminResisterResponse(member.isAdmin(), member.isManager(), member.isStaff()));
@@ -108,8 +106,8 @@ public class AdminController {
     }
 
     @Secured("ROLE_ADMIN")
-    @PutMapping("/manage/ban")
-    public ResponseEntity<Account> manageIsBanAccount(@RequestParam Long id) {
+    @PatchMapping("/manage/ban")
+    public ResponseEntity<Account> modifyIsBanAccount(@RequestParam Long id) {
         Member member = memberService.findUserById(id);
         member.setBan(!member.isBan());
         Member savedUser = memberService.editUser(member);
@@ -119,7 +117,7 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @PostMapping("/notice")
-    public ResponseEntity<CreateNoticeResponse> writeNotice(
+    public ResponseEntity<CreateNoticeResponse> uploadNotice(
             @AuthenticationPrincipal MemberPrincipal memberPrincipal,
             @RequestBody @Valid CreateNoticeRequest createNoticeRequest) {
 
@@ -137,16 +135,51 @@ public class AdminController {
                 .body(new CreateNoticeResponse(true, savedNotice.getId(), savedNotice.getTitle()));
     }
 
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @PatchMapping("/notice/{id}")
+    public ResponseEntity<?> modifyNotice(
+            @RequestBody ModifyNoticeRequest modifyNoticeRequest,
+            @PathVariable Long id) {
+        Notice notice = noticeService.findById(id);
+
+        Notice savedNotice = noticeService.save(Notice.builder()
+                .id(notice.getId())
+                .title(modifyNoticeRequest.getTitle())
+                .content(modifyNoticeRequest.getContent())
+                .member(notice.getMember())
+                .createAt(notice.getCreateAt())
+                .isTop(modifyNoticeRequest.isTop())
+                .view(notice.getView())
+                .isExistImage(modifyNoticeRequest.isExistImage())
+                .build());
+
+        return ResponseEntity.ok()
+                .body(new ModifyNoticeResponse(true, savedNotice.getId(), savedNotice.getTitle()));
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @DeleteMapping("/notice/{id}")
+    public ResponseEntity<?> deleteNotice(@PathVariable Long id) {
+
+        Long deleteById = noticeService.deleteById(id);
+
+        return ResponseEntity.ok()
+                .body(deleteById);
+    }
+
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
-    @PostMapping("/image")
-    public String uploadImage(@RequestParam("image") MultipartFile image) throws IOException {
-        String upload = s3Service.upload(image, "/images");
-        return CLOUD_FRONT_URL + upload;
+    @GetMapping("/article/category")
+    public ResponseEntity<?> getArticleCategory() {
+
+        List<ArticleType> all = articleTypeService.findAll();
+
+        return ResponseEntity.ok()
+                .body(all);
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PostMapping("/article/category")
-    public ResponseEntity<?> createArticleCategory(@RequestParam("name") String name) {
+    public ResponseEntity<?> uploadArticleCategory(@RequestParam("name") String name) {
         ArticleType save = articleTypeService.save(ArticleType.builder()
                 .typeName(name)
                 .build());
@@ -156,8 +189,36 @@ public class AdminController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
+    @PatchMapping("/article/category/{target}")
+    public ResponseEntity<?> modifyArticleCategory(
+            @PathVariable String target,
+            @RequestParam("name") String name) {
+
+        ArticleType articleType = articleTypeService.findArticleType(target);
+
+        ArticleType save = articleTypeService.save(ArticleType.builder()
+                .id(articleType.getId())
+                .typeName(name)
+                .build());
+
+        return ResponseEntity.ok()
+                .body(save);
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
+    @DeleteMapping("/article/category/{target}")
+    public ResponseEntity<?> deleteArticleCategory(@PathVariable String target) {
+
+        ArticleType articleType = articleTypeService.findArticleType(target);
+        Long deleteById = articleTypeService.deleteById(articleType.getId());
+
+        return ResponseEntity.ok()
+                .body(deleteById);
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PostMapping("/article")
-    public ResponseEntity<?> writeArticle(
+    public ResponseEntity<?> uploadArticle(
             @AuthenticationPrincipal MemberPrincipal memberPrincipal,
             @RequestBody @Valid CreateArticleRequest createArticleRequest) {
 
@@ -172,7 +233,6 @@ public class AdminController {
                 .view(0)
                 .isExistImage(createArticleRequest.isExistImage())
                 .build());
-
 
         return ResponseEntity.ok()
                 .body(save);

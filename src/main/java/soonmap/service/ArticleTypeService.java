@@ -7,6 +7,8 @@ import soonmap.entity.ArticleType;
 import soonmap.exception.CustomException;
 import soonmap.repository.ArticleTypeRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ArticleTypeService {
@@ -20,5 +22,14 @@ public class ArticleTypeService {
     public ArticleType findArticleType(String typeName) {
         return articleTypeRepository.findArticleTypeByTypeName(typeName)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리"));
+    }
+
+    public List<ArticleType> findAll() {
+        return articleTypeRepository.findAll();
+    }
+
+    public Long deleteById(Long id) {
+        articleTypeRepository.deleteById(id);
+        return id;
     }
 }
