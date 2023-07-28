@@ -85,7 +85,7 @@ public class AdminController {
 
         Member member = memberService.addAdmin(adminResisterRequest);
         return ResponseEntity.ok()
-                .body(new AdminResisterResponse(member.isAdmin(), member.isManager(), member.isStaff()));
+                .body(new AdminResisterResponse(true, member.isAdmin(), member.isManager(), member.isStaff()));
     }
 
     @Secured("ROLE_ADMIN")
