@@ -270,9 +270,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    @Disabled("ROLE_USER 임에도 성공하는 이유 모름")
-    @WithMockUser(username = "user@domain.com", authorities = {"ROLE_USER"})
-    @DisplayName("유저의 어드민 계정 조회 실패 테스트")
+    @DisplayName("어드민 계정 조회 실패 테스트")
     void userGetAdminAccount() throws Exception {
         // given
         Member adminAccount1 = new Member(1L, "testid1", "test1@email.com", "test1", "testPassword1", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
@@ -282,7 +280,7 @@ public class AdminControllerTest {
         given(memberService.findAdminAccount()).willReturn(memberList);
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/admin/account"));
+        ResultActions resultActions = mockMvc.perform(get("/admin/account/all"));
 
         // then
 
