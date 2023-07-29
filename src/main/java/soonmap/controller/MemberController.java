@@ -74,8 +74,8 @@ public class MemberController {
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                    .header("accessToken", AccessToken)
-                    .body("Name: " + name + ", Email: " + email + ", id: " + id);
+//                    .header("accessToken", AccessToken)
+                    .body(AccessToken);
         } catch (IOException e) {
             // 예외 처리
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get user profile.");
@@ -117,8 +117,8 @@ public class MemberController {
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                    .header("accessToken", AccessToken)
-                    .body("Name: " + name + ", Email: " + email + ", id: " + id);
+//                    .header("accessToken", AccessToken)
+                    .body(AccessToken);
 
         } catch (HttpClientErrorException.BadRequest ex) {
             // HttpClientErrorException$BadRequest 처리

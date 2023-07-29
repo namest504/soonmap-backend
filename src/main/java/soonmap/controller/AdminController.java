@@ -25,6 +25,7 @@ import soonmap.security.jwt.JwtProvider;
 import soonmap.security.jwt.MemberPrincipal;
 import soonmap.service.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -43,22 +44,24 @@ public class AdminController {
     private final ArticleTypeService articleTypeService;
 
     @PostMapping("/login")
-    public ResponseEntity<AdminLoginResponse> adminLogin(@RequestBody @Valid AdminLoginRequest adminLoginRequest) {
+    public ResponseEntity<AdminLoginResponse> adminLogin(
+            @RequestBody @Valid AdminLoginRequest adminLoginRequest) {
         Member member = memberService.loginAdmin(adminLoginRequest);
         String accessToken = jwtProvider.createAccessToken(member.getId());
         String refreshToken = jwtProvider.createRefreshToken(member.getId());
 
+        /*
+        SSL 적용 전까지 refresh 쿠키 전송방식 사용 불가
         ResponseCookie responseCookie = memberService.createHttpOnlyCookie(refreshToken);
-
+        */
         memberService.saveAdminRefreshToken(member.getId(), refreshToken);
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .header("accessToken", accessToken)
-                .body(new AdminLoginResponse(true, member.isAdmin(), member.isManager(), member.isStaff()));
+//                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .body(new AdminLoginResponse(true, member.isAdmin(), member.isManager(), member.isStaff(), accessToken, refreshToken));
     }
 
     @GetMapping("/refresh")
-    public ResponseEntity<Boolean> refreshAdminToken(@CookieValue("refreshToken") String token) {
+    public ResponseEntity<?> refreshAdminToken(@CookieValue("refreshToken") String token) {
         Claims claims = jwtProvider.decodeJwtToken(token);
 
         if (!claims.getSubject().equals("refresh_token")) {
@@ -74,8 +77,8 @@ public class AdminController {
 
         String accessToken = jwtProvider.createAccessToken(uid);
         return ResponseEntity.ok()
-                .header("accessToken", accessToken)
-                .body(true);
+//                .header("accessToken", accessToken)
+                .body(accessToken);
     }
 
     @PostMapping("/register")
@@ -85,7 +88,7 @@ public class AdminController {
 
         Member member = memberService.addAdmin(adminResisterRequest);
         return ResponseEntity.ok()
-                .body(new AdminResisterResponse(member.isAdmin(), member.isManager(), member.isStaff()));
+                .body(new AdminResisterResponse(true, member.isAdmin(), member.isManager(), member.isStaff()));
     }
 
     @Secured("ROLE_ADMIN")
