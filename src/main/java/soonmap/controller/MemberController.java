@@ -42,7 +42,7 @@ public class MemberController {
     private String apiResult = null;
 
     /**
-     naver oauth
+     * naver oauth
      */
 
     // Client가 Server에게 보낸 code, state를 받고 AccessToken을 생성 후 사용자 정보를 추출한다.
@@ -74,7 +74,7 @@ public class MemberController {
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-//                    .header("accessToken", AccessToken)
+                    //.header("accessToken", AccessToken)
                     .body(AccessToken);
         } catch (IOException e) {
             // 예외 처리
@@ -117,7 +117,7 @@ public class MemberController {
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-//                    .header("accessToken", AccessToken)
+                    //.header("accessToken", AccessToken)
                     .body(AccessToken);
 
         } catch (HttpClientErrorException.BadRequest ex) {
