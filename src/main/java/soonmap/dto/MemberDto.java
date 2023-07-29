@@ -43,6 +43,8 @@ public class MemberDto {
         private boolean isAdmin;
         private boolean isManager;
         private boolean isStaff;
+        private String accessToken;
+        private String refreshToken;
     }
 
     @Getter
