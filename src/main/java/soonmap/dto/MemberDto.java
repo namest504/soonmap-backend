@@ -5,6 +5,7 @@ import lombok.*;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class MemberDto {
     @Setter
     @AllArgsConstructor
     public static class AdminResisterResponse {
+        private boolean success;
         private boolean isAdmin;
         private boolean isManager;
         private boolean isStaff;
@@ -25,8 +27,11 @@ public class MemberDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AdminResisterRequest {
+        @NotBlank
         private String name;
+        @NotBlank
         private String userId;
+        @NotBlank
         private String userPw;
     }
 
@@ -38,6 +43,8 @@ public class MemberDto {
         private boolean isAdmin;
         private boolean isManager;
         private boolean isStaff;
+        private String accessToken;
+        private String refreshToken;
     }
 
     @Getter
@@ -45,7 +52,9 @@ public class MemberDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AdminLoginRequest {
+        @NotBlank
         private String userId;
+        @NotBlank
         private String userPw;
     }
 
