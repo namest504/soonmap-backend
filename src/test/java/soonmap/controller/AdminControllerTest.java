@@ -30,6 +30,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import soonmap.config.SecurityConfig;
 import soonmap.dto.MemberDto.AdminLoginRequest;
+import soonmap.dto.TokenDto;
+import soonmap.dto.TokenDto.RefreshTokenRequest;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.exception.CustomException;
@@ -79,6 +81,7 @@ public class AdminControllerTest {
 //    MemberPrincipal memberPrincipal;
 
     private AdminLoginRequest adminLoginRequest;
+    private RefreshTokenRequest refreshTokenRequest;
     private Member member;
     private Claims claims;
 
@@ -173,13 +176,12 @@ public class AdminControllerTest {
 
     @Test
     @WithMockUser
-    @Disabled
     @DisplayName("어드민 refresh 성공 테스트")
     void successRefreshAdminToken() throws Exception {
         // given
         claims.setSubject("refresh_token");
         claims.put("uid", 1L);
-
+        refreshTokenRequest = new RefreshTokenRequest("REFRESH_TOKEN");
         given(jwtProvider.decodeJwtToken("REFRESH_TOKEN")).willReturn(claims);
         given(memberService.findUserById(1L)).willReturn(member);
         given(memberService.getAdminRefreshToken(member.getId())).willReturn("REFRESH_TOKEN");
@@ -188,8 +190,11 @@ public class AdminControllerTest {
         Cookie refreshTokenCookie = new Cookie("refreshToken", "REFRESH_TOKEN");
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/admin/refresh")
-                .cookie(refreshTokenCookie));
+        ResultActions resultActions = mockMvc.perform(post("/admin/refresh")
+                .contentType("application/json")
+                .with(csrf())
+                .content(objectMapper.writeValueAsString(refreshTokenRequest)));
+//                .cookie(refreshTokenCookie));
 
         // then
         resultActions
