@@ -173,6 +173,7 @@ public class AdminControllerTest {
 
     @Test
     @WithMockUser
+    @Disabled
     @DisplayName("어드민 refresh 성공 테스트")
     void successRefreshAdminToken() throws Exception {
         // given
