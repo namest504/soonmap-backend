@@ -11,5 +11,4 @@ public class TokenDto {
     public static class RefreshTokenRequest {
         private String refreshToken;
     }
-
 }
