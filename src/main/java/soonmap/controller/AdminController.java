@@ -16,6 +16,8 @@ import soonmap.dto.NoticeDto.CreateNoticeRequest;
 import soonmap.dto.NoticeDto.CreateNoticeResponse;
 import soonmap.dto.NoticeDto.ModifyNoticeRequest;
 import soonmap.dto.NoticeDto.ModifyNoticeResponse;
+import soonmap.dto.TokenDto;
+import soonmap.dto.TokenDto.RefreshTokenRequest;
 import soonmap.entity.Article;
 import soonmap.entity.ArticleType;
 import soonmap.entity.Member;
@@ -60,9 +62,10 @@ public class AdminController {
                 .body(new AdminLoginResponse(true, member.isAdmin(), member.isManager(), member.isStaff(), accessToken, refreshToken));
     }
 
-    @GetMapping("/refresh")
-    public ResponseEntity<?> refreshAdminToken(@CookieValue("refreshToken") String token) {
-        Claims claims = jwtProvider.decodeJwtToken(token);
+    @PostMapping("/refresh")
+//    public ResponseEntity<?> refreshAdminToken(@CookieValue("refreshToken") String token) {
+    public ResponseEntity<?> refreshAdminToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        Claims claims = jwtProvider.decodeJwtToken(refreshTokenRequest.getRefreshToken());
 
         if (!claims.getSubject().equals("refresh_token")) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 요청입니다.");
