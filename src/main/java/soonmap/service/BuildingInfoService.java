@@ -43,26 +43,4 @@ public class BuildingInfoService {
             List<BuildingResponseDto> buildingResponseDtos = buildings.stream().map(BuildingResponseDto::new).collect(Collectors.toList());
             return buildingResponseDtos;
         }
-
-    public String ChangeBuildingListToJson(List<BuildingResponseDto> buildingResponseDtos) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String buildingJson = objectMapper.writeValueAsString(buildingResponseDtos);
-            return buildingJson;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public String ChangeFloorListToJson(List<FloorResponseDto> floorResponseDtos) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String buildingJson = objectMapper.writeValueAsString(floorResponseDtos);
-            return buildingJson;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

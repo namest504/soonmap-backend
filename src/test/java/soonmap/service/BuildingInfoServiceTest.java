@@ -3,6 +3,8 @@ package soonmap.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,6 +17,7 @@ import soonmap.entity.Floor;
 import soonmap.repository.BuildingRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,9 +29,12 @@ public class BuildingInfoServiceTest {
     @InjectMocks
     private BuildingInfoService buildingInfoService;
 
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        objectMapper = new ObjectMapper();
     }
 
     @Test
@@ -124,42 +130,15 @@ public class BuildingInfoServiceTest {
         assertEquals(building2.getName(), buildingList.get(1).getName());
         assertEquals(building2.getFloors(), buildingList.get(1).getFloors());
     }
-
-        @Test
-        void testChangeBuildingListToJson() {
-            // Given
-            List<BuildingResponseDto> buildingResponseDtos = new ArrayList<>();
-            BuildingResponseDto buildingDto1 = new BuildingResponseDto("의료과학관", 5, "의료대입니다.");
-            BuildingResponseDto buildingDto2 = new BuildingResponseDto("멀티미디어관", 10, "멀티미디어관입니다.");
-            buildingResponseDtos.add(buildingDto1);
-            buildingResponseDtos.add(buildingDto2);
-
-            // When
-            BuildingInfoService buildingInfoService = new BuildingInfoService(null);
-            String json = buildingInfoService.ChangeBuildingListToJson(buildingResponseDtos);
-
-            // Then
-            String expectedJson = "[{\"name\":\"의료과학관\",\"floors\":5,\"description\":\"의료대입니다.\"},{\"name\":\"멀티미디어관\",\"floors\":10,\"description\":\"멀티미디어관입니다.\"}]";
-            assertEquals(expectedJson, json);
-        }
-
-        @Test
-        void testChangeFloorListToJson() {
-            // Given
-            List<FloorResponseDto> floorResponseDtos = new ArrayList<>();
-            FloorResponseDto floorDto1 = new FloorResponseDto("1층", "qwer1234");
-            FloorResponseDto floorDto2 = new FloorResponseDto("2층", "1234qwer");
-            floorResponseDtos.add(floorDto1);
-            floorResponseDtos.add(floorDto2);
-
-            // When
-            BuildingInfoService buildingInfoService = new BuildingInfoService(null);
-            String json = buildingInfoService.ChangeFloorListToJson(floorResponseDtos);
-
-            // Then
-            String expectedJson = "[{\"description\":\"1층\",\"dir\":\"qwer1234\"},{\"description\":\"2층\",\"dir\":\"1234qwer\"}]";
-            assertEquals(expectedJson, json);
-        }
-
-
+//    @Test
+//    public void testGetAllBuildingListReturnsJson() throws JsonProcessingException {
+//        List<BuildingResponseDto> buildingResponseDtoList = new ArrayList<>();
+//        BuildingResponseDto building1 = new BuildingResponseDto("의료과학관", 6, "의료대 입니다.");
+//        BuildingResponseDto building2 = new BuildingResponseDto("인문과학관", 6, "인문대 입니다.");
+//        buildingResponseDtoList.add(building1);
+//        buildingResponseDtoList.add(building2);
+//
+//        String jsonResponse = objectMapper.writeValueAsString(buildingResponseDtoList);
+//        assertEquals(buildingResponseDtoList,jsonResponse);
+//    }
 }
