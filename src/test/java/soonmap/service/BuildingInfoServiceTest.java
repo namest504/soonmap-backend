@@ -80,12 +80,18 @@ public class BuildingInfoServiceTest {
         building1.setId(1L);
         building1.setName("의료과학관");
         building1.setFloors(5);
+        building1.setLatitude(1.1234);
+        building1.setLongitude(1.5678);
+        building1.setUniqueNumber("H");
         buildings.add(building1);
 
         Building building2 = new Building();
         building2.setId(2L);
         building2.setName("멀티미디어관");
         building2.setFloors(10);
+        building2.setLatitude(2.1234);
+        building2.setLongitude(2.5678);
+        building2.setUniqueNumber("9");
         buildings.add(building2);
 
         when(buildingRepository.findAll()).thenReturn(buildings);
@@ -99,6 +105,12 @@ public class BuildingInfoServiceTest {
         assertEquals(building1.getFloors(), buildingList.get(0).getFloors());
         assertEquals(building2.getName(), buildingList.get(1).getName());
         assertEquals(building2.getFloors(), buildingList.get(1).getFloors());
+        assertEquals(building1.getLongitude(), buildingList.get(0).getLongitude());
+        assertEquals(building1.getLatitude(), buildingList.get(0).getLatitude());
+        assertEquals(building1.getUniqueNumber(), buildingList.get(0).getUniqueNumber());
+        assertEquals(building2.getLongitude(), buildingList.get(1).getLongitude());
+        assertEquals(building2.getLatitude(), buildingList.get(1).getLatitude());
+        assertEquals(building2.getUniqueNumber(), buildingList.get(1).getUniqueNumber());
     }
 
     @Test
@@ -110,12 +122,18 @@ public class BuildingInfoServiceTest {
         building1.setId(1L);
         building1.setName(buildingName);
         building1.setFloors(3);
+        building1.setLatitude(1.1234);
+        building1.setLongitude(1.5678);
+        building1.setUniqueNumber("H");
         buildings.add(building1);
 
         Building building2 = new Building();
         building2.setId(2L);
         building2.setName(buildingName);
         building2.setFloors(5);
+        building2.setLatitude(2.1234);
+        building2.setLongitude(2.5678);
+        building2.setUniqueNumber("9");
         buildings.add(building2);
 
         when(buildingRepository.findBuildingsByName(buildingName)).thenReturn(buildings);
@@ -129,6 +147,12 @@ public class BuildingInfoServiceTest {
         assertEquals(building1.getFloors(), buildingList.get(0).getFloors());
         assertEquals(building2.getName(), buildingList.get(1).getName());
         assertEquals(building2.getFloors(), buildingList.get(1).getFloors());
+        assertEquals(building1.getLongitude(), buildingList.get(0).getLongitude());
+        assertEquals(building1.getLatitude(), buildingList.get(0).getLatitude());
+        assertEquals(building1.getUniqueNumber(), buildingList.get(0).getUniqueNumber());
+        assertEquals(building2.getLongitude(), buildingList.get(1).getLongitude());
+        assertEquals(building2.getLatitude(), buildingList.get(1).getLatitude());
+        assertEquals(building2.getUniqueNumber(), buildingList.get(1).getUniqueNumber());
     }
 //    @Test
 //    public void testGetAllBuildingListReturnsJson() throws JsonProcessingException {

@@ -28,10 +28,17 @@ public class BuildingInfoDto {
         private String name;
         private int floors;
         private String description;
+        private double latitude; // 위도
+        private double longitude; // 경도
+        private String uniqueNumber; // 고유번호
+
         public BuildingResponseDto(Building building) {
             this.name = building.getName();
             this.floors = building.getFloors();
             this.description = building.getDescription();
+            this.latitude = building.getLatitude();
+            this.longitude = building.getLongitude();
+            this.uniqueNumber = building.getUniqueNumber();
         }
     }
 }

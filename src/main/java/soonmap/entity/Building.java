@@ -32,4 +32,6 @@ public class Building {
     private double latitude; // 위도
     @Column(nullable = false)
     private double longitude; // 경도
+    @Column(nullable = false)
+    private String uniqueNumber; // 고유번호
 }
