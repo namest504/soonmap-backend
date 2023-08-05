@@ -1,9 +1,6 @@
 package soonmap.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import soonmap.entity.Building;
 import soonmap.entity.Floor;
 
@@ -39,6 +36,53 @@ public class BuildingInfoDto {
             this.latitude = building.getLatitude();
             this.longitude = building.getLongitude();
             this.uniqueNumber = building.getUniqueNumber();
+        }
+
+        public static BuildingResponseDto of(Building building) {
+            return new BuildingResponseDto(building.getName(), building.getFloors(), building.getDescription(), building.getLatitude(), building.getLongitude(), building.getUniqueNumber());
+        }
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BuildingRequest {
+        private String name;
+        private int floors;
+        private String description;
+        private double latitude; // 위도
+        private double longitude; // 경도
+        private String uniqueNumber; // 고유번호
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class BuildingPageResponse {
+        private int totalPage;
+        private List<BuildingResponseDto> buildingResponseDtoList;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class FloorRequest {
+        private String description;
+        private int floorValue;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class FloorResponse {
+        private String description;
+        private String dir;
+        private int floorValue;
+        private String uniqueNumber;
+
+        public static FloorResponse of(Floor floor) {
+            return new FloorResponse(floor.getDescription(), floor.getDir(), floor.getFloorValue(), floor.getBuilding().getUniqueNumber());
         }
     }
 }

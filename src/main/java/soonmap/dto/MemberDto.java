@@ -40,6 +40,7 @@ public class MemberDto {
     @AllArgsConstructor
     public static class AdminLoginResponse {
         private boolean success;
+        private String name;
         private boolean isAdmin;
         private boolean isManager;
         private boolean isStaff;
