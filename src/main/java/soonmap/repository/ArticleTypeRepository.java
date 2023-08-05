@@ -14,4 +14,6 @@ public interface ArticleTypeRepository extends JpaRepository<ArticleType, Long> 
     Optional<ArticleType> findArticleTypeById(Long id);
 
     Page<ArticleType> findAll(Pageable pageable);
+
+    Optional<ArticleType> findByTypeName(String typeName);
 }

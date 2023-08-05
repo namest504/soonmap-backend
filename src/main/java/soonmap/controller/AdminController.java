@@ -201,7 +201,7 @@ public class AdminController {
 
         Page<ArticleType> articleTypePage = articleTypeService.findAll(page, 10);
         int totalPages = articleTypePage.getTotalPages();
-        List<ArticleType> list = articleTypePage.toList();
+        List<ArticleType> list = articleTypePage.getContent();
 
         return ResponseEntity.ok()
                 .body(new ArticleTypeResponse(totalPages, list));
@@ -210,6 +210,10 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PostMapping("/article/category")
     public ResponseEntity<?> uploadArticleCategory(@RequestBody ArticleCategoryRequest articleCategoryRequest) {
+
+        ArticleType articleType = articleTypeService.findByTypeName(articleCategoryRequest.getName())
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "중복된 이름의 카테고리입니다."));
+
         ArticleType save = articleTypeService.save(ArticleType.builder()
                 .typeName(articleCategoryRequest.getName())
                 .description(articleCategoryRequest.getDescription())
@@ -274,7 +278,7 @@ public class AdminController {
     public ResponseEntity<?> getArticle(@RequestParam int page) {
 
         Page<Article> articles = articleService.findAllPage(page, 9);
-        List<ArticleResponse> articleResponseList = articles.stream()
+        List<ArticleResponse> articleResponseList = articles.getContent().stream()
                 .map(ArticleResponse::of)
                 .collect(Collectors.toList());
 
@@ -290,10 +294,9 @@ public class AdminController {
 
         Member member = memberService.findUserById(memberPrincipal.getMember().getId())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "인증되지 않은 유저 입니다."));
-        ;
 
         Page<Article> articles = articleService.findAllByMember(member, page, 9);
-        List<ArticleResponse> articleResponseList = articles.stream()
+        List<ArticleResponse> articleResponseList = articles.getContent().stream()
                 .map(ArticleResponse::of)
                 .collect(Collectors.toList());
 
@@ -412,7 +415,7 @@ public class AdminController {
     ) {
 
         Page<Building> pageAll = buildingInfoService.findPageAll(page, 10);
-        List<BuildingResponseDto> result = pageAll.toList().stream()
+        List<BuildingResponseDto> result = pageAll.getContent().stream()
                 .map(BuildingResponseDto::of)
                 .collect(Collectors.toList());
 
