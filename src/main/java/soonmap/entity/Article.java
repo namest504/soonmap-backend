@@ -33,6 +33,4 @@ public class Article {
     private ArticleType articleType;
 
     private int view;
-
-    private boolean isExistImage;
 }
