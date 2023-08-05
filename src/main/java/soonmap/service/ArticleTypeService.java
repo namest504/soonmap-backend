@@ -3,6 +3,7 @@ package soonmap.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import soonmap.entity.Article;
@@ -33,7 +34,7 @@ public class ArticleTypeService {
     }
 
     public Page<ArticleType> findAll(int page, int length) {
-        PageRequest pageRequest = PageRequest.of(page, length);
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
         return articleTypeRepository.findAll(pageRequest);
     }
 

@@ -211,8 +211,9 @@ public class AdminController {
     @PostMapping("/article/category")
     public ResponseEntity<?> uploadArticleCategory(@RequestBody ArticleCategoryRequest articleCategoryRequest) {
 
-        ArticleType articleType = articleTypeService.findByTypeName(articleCategoryRequest.getName())
-                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "중복된 이름의 카테고리입니다."));
+        if (articleTypeService.findByTypeName(articleCategoryRequest.getName()).isPresent()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "중복된 이름의 카테고리입니다.");
+        }
 
         ArticleType save = articleTypeService.save(ArticleType.builder()
                 .typeName(articleCategoryRequest.getName())
