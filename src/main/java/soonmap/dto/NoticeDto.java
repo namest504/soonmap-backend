@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import soonmap.entity.Notice;
+
+import java.util.List;
 
 public class NoticeDto {
 
@@ -45,5 +48,13 @@ public class NoticeDto {
         private boolean success;
         private Long id;
         private String title;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class NoticeResponse {
+        private int totalPage;
+        private List<Notice> articleTypeList;
     }
 }

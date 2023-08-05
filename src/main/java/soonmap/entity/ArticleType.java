@@ -19,4 +19,7 @@ public class ArticleType {
 
     @Column
     private String typeName;
+
+    @Column
+    private String description;
 }
