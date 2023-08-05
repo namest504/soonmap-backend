@@ -107,7 +107,7 @@ class MemberServiceTest {
 
         CustomException exception = assertThrows(CustomException.class, () -> memberService.loginAdmin(request));
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getHttpStatus());
-        assertEquals("잘못된 정보입니다.", exception.getInfo());
+        assertEquals("존재하지 않는 계정입니다.", exception.getInfo());
     }
 
     @Test
@@ -121,7 +121,7 @@ class MemberServiceTest {
 
         CustomException exception = assertThrows(CustomException.class, () -> memberService.loginAdmin(request));
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getHttpStatus());
-        assertEquals("잘못된 정보입니다.", exception.getInfo());
+        assertEquals("존재하지 않는 계정입니다.", exception.getInfo());
     }
 
     @Test

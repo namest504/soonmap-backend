@@ -9,7 +9,7 @@ import soonmap.entity.Article;
 import soonmap.entity.Member;
 import soonmap.repository.ArticleRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,15 +21,22 @@ public class ArticleService {
         return articleRepository.save(article);
     }
 
-    public List<Article> getArticles(int page, int length) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        Page<Article> pagingArticle = articleRepository.findAll(pageRequest);
-        return pagingArticle.toList();
+    public Optional<Article> findOneById(Long id) {
+        return articleRepository.findById(id);
     }
 
-    public List<Article> getMemberArticles(Member member, int page, int length) {
+    public Page<Article> findAllPage(int page, int length) {
         PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        Page<Article> pagingArticle = articleRepository.findAllByMember(member, pageRequest);
-        return pagingArticle.toList();
+        return articleRepository.findAll(pageRequest);
+    }
+
+    public Page<Article> findAllByMember(Member member, int page, int length) {
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return articleRepository.findAllByMember(member, pageRequest);
+    }
+
+    public Long deleteById(Long id) {
+        articleRepository.deleteById(id);
+        return id;
     }
 }

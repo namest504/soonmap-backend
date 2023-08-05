@@ -76,6 +76,12 @@ public class AdminControllerTest {
     @MockBean
     ArticleTypeService articleTypeService;
 
+    @MockBean
+    BuildingInfoService buildingInfoService;
+
+    @MockBean
+    FloorService floorService;
+
 
 //    @MockBean
 //    MemberPrincipal memberPrincipal;
@@ -183,7 +189,7 @@ public class AdminControllerTest {
         claims.put("uid", 1L);
         refreshTokenRequest = new RefreshTokenRequest("REFRESH_TOKEN");
         given(jwtProvider.decodeJwtToken("REFRESH_TOKEN")).willReturn(claims);
-        given(memberService.findUserById(1L)).willReturn(member);
+        given(memberService.findUserById(1L)).willReturn(Optional.ofNullable(member));
         given(memberService.getAdminRefreshToken(member.getId())).willReturn("REFRESH_TOKEN");
         given(jwtProvider.createAccessToken(member.getId())).willReturn("ACCESS_TOKEN");
 

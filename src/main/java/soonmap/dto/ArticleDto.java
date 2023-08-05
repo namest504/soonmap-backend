@@ -5,12 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import soonmap.entity.Article;
-import soonmap.entity.ArticleType;
-import soonmap.entity.Member;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ArticleDto {
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ArticlePageResponse {
+        private int totalPage;
+        private List<ArticleResponse> articleList;
+    }
 
     @Getter
     @Setter
@@ -20,14 +27,24 @@ public class ArticleDto {
         private String title;
         private String content;
         private LocalDateTime createAt;
-        private Member member;
-        private ArticleType articleType;
+        private String writer;
+        private Long articleTypeId;
         private int view;
-        private boolean isExistImage;
 
         public static ArticleResponse of(Article article) {
-            return new ArticleResponse(article.getId(), article.getTitle(), article.getContent(), article.getCreateAt(), article.getMember(), article.getArticleType(), article.getView(), article.isExistImage());
+            return new ArticleResponse(article.getId(), article.getTitle(), article.getContent(), article.getCreateAt(), article.getMember().getUsername(), article.getArticleType().getId(), article.getView());
         }
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ModifyArticleRequest {
+        private String title;
+        private String content;
+        private LocalDateTime createAt;
+        private Long articleTypeId;
     }
 
     @Getter
@@ -38,8 +55,7 @@ public class ArticleDto {
         private String title;
         private String content;
         private LocalDateTime createAt;
-        private String articleType;
-        private boolean isExistImage;
+        private Long articleTypeId;
     }
 
     @Getter
@@ -49,6 +65,14 @@ public class ArticleDto {
         private boolean success;
         private Long id;
         private String title;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ArticleCategoryRequest {
+        private String name;
+        private String description;
     }
 
 }

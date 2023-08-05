@@ -47,8 +47,8 @@ public class MemberService implements UserDetailsService {
 
     public void validateDuplicatedId(String id) {
         memberRepository.findMemberByUserId(id)
-                .ifPresent( p -> {
-                    throw new CustomException(HttpStatus.BAD_REQUEST,"ID 문제");
+                .ifPresent(p -> {
+                    throw new CustomException(HttpStatus.BAD_REQUEST, "ID 문제");
                 });
     }
 
@@ -60,7 +60,7 @@ public class MemberService implements UserDetailsService {
     public Member addAdmin(AdminResisterRequest adminResisterRequest) {
         return memberRepository.save(Member.builder()
                 .userName(adminResisterRequest.getName())
-                        .userId(adminResisterRequest.getUserId())
+                .userId(adminResisterRequest.getUserId())
                 .userEmail(null)
                 .userPassword(passwordEncoder.encode(adminResisterRequest.getUserPw()))
                 .accountType(AccountType.valueOf("ADMIN"))
@@ -75,14 +75,14 @@ public class MemberService implements UserDetailsService {
 
     public Member loginAdmin(AdminLoginRequest adminLoginRequest) {
         Member member = memberRepository.findMemberByUserId(adminLoginRequest.getUserId())
-                .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 정보입니다."));
+                .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다."));
 
         if (member.isBan()) {
             throw new CustomException(HttpStatus.FORBIDDEN, "접근이 제한되었습니다.");
         }
 
         if (!passwordEncoder.matches(adminLoginRequest.getUserPw(), member.getPassword())) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 정보입니다.");
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다.");
         }
 
         if (member.isAdmin() || member.isManager() || member.isStaff()) {
@@ -127,11 +127,9 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findAll();
     }
 
-    public Member findUserById(Long id) {
-        return memberRepository.findMemberById(id)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
+    public Optional<Member> findUserById(Long id) {
+        return memberRepository.findMemberById(id);
     }
-
 
 
 //    public Optional<Member> findUserById(String id) {
@@ -142,6 +140,7 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findMemberByUserEmail(email);
 
     }
+
     public Optional<Member> findUserBySnsId(String sns_id) {
         return memberRepository.findBySnsId(sns_id);
     }
