@@ -38,7 +38,7 @@ public class S3Service {
 
         removeNewFile(uploadFile);
 
-        return uploadImageUrl;
+        return file;
     }
 
     private String putS3(File uploadFile, String fileName) {
