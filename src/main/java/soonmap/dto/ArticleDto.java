@@ -28,11 +28,11 @@ public class ArticleDto {
         private String content;
         private LocalDateTime createAt;
         private String writer;
-        private Long articleTypeId;
+        private String articleTypeName;
         private int view;
 
         public static ArticleResponse of(Article article) {
-            return new ArticleResponse(article.getId(), article.getTitle(), article.getContent(), article.getCreateAt(), article.getMember().getUsername(), article.getArticleType().getId(), article.getView());
+            return new ArticleResponse(article.getId(), article.getTitle(), article.getContent(), article.getCreateAt(), article.getMember().getUsername(), article.getArticleType().getTypeName(), article.getView());
         }
     }
 
@@ -54,7 +54,6 @@ public class ArticleDto {
     public static class CreateArticleRequest {
         private String title;
         private String content;
-        private LocalDateTime createAt;
         private Long articleTypeId;
     }
 
