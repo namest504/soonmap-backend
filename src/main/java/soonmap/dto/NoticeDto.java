@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import soonmap.entity.Notice;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class NoticeDto {
@@ -18,7 +19,6 @@ public class NoticeDto {
         private String title;
         private String content;
         private boolean isTop;
-        private boolean isExistImage;
     }
 
     @Getter
@@ -38,7 +38,6 @@ public class NoticeDto {
         private String title;
         private String content;
         private boolean isTop;
-        private boolean isExistImage;
     }
 
     @Getter
@@ -53,8 +52,25 @@ public class NoticeDto {
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class NoticeResponse {
+    public static class NoticePageResponse {
         private int totalPage;
-        private List<Notice> articleTypeList;
+        private List<NoticeResponse> articleTypeList;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class NoticeResponse {
+        private Long id;
+        private String title;
+        private String content;
+        private String writer;
+        private LocalDateTime createAt;
+        private boolean isTop;
+        private int view;
+
+        public static NoticeResponse of(Notice notice) {
+            return new NoticeResponse(notice.getId(), notice.getTitle(), notice.getContent(), notice.getMember().getUsername(),notice.getCreateAt(), notice.isTop(), notice.getView());
+        }
     }
 }
