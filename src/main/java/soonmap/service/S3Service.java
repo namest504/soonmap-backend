@@ -6,8 +6,10 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import soonmap.exception.CustomException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +28,11 @@ public class S3Service {
     private String bucket;
 
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
+
+        if (multipartFile.getOriginalFilename().contains(" ")) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "파일 이름에 띄어쓰기가 포함되어 있습니다.");
+        }
+
         File uploadFile = convert(multipartFile)
                 .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
         return upload(uploadFile, dirName);

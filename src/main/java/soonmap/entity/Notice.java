@@ -18,24 +18,22 @@ public class Notice {
     @Column(name = "notice_id")
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String title;
 
-    @Column
+    @Column(nullable = false)
+    @Lob
     private String content;
 
     @OneToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime createAt;
 
-    @Column
+    @Column(nullable = false)
     private boolean isTop;
 
-    @Column
+    @Column(nullable = false)
     private int view;
-
-    @Column
-    private boolean isExistImage;
 }

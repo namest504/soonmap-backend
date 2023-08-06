@@ -21,7 +21,7 @@ public class Floor {
     @Column
     private String dir; // S3 이미지 경로
 
-    @Column
+    @Column(nullable = false)
     private int floorValue;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -128,9 +128,13 @@ public class AdminController {
     @GetMapping("/notice")
     public ResponseEntity<?> getPageNotice(@RequestParam("page") int page) {
         Page<Notice> all = noticeService.findAll(page, 9);
+        List<NoticeResponse> result = all.getContent()
+                .stream()
+                .map(NoticeResponse::of)
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok()
-                .body(new NoticeResponse(all.getTotalPages(), all.toList()));
+                .body(new NoticePageResponse(all.getTotalPages(), result));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
@@ -146,7 +150,6 @@ public class AdminController {
                 .createAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .isTop(createNoticeRequest.isTop())
                 .view(0)
-                .isExistImage(createNoticeRequest.isExistImage())
                 .build());
 
         return ResponseEntity.ok()
@@ -168,7 +171,6 @@ public class AdminController {
                 .createAt(notice.getCreateAt())
                 .isTop(modifyNoticeRequest.isTop())
                 .view(notice.getView())
-                .isExistImage(modifyNoticeRequest.isExistImage())
                 .build());
 
         return ResponseEntity.ok()
@@ -271,7 +273,7 @@ public class AdminController {
                 .build());
 
         return ResponseEntity.ok()
-                .body(save);
+                .body(new CreateNoticeResponse(true, save.getId(), save.getTitle()));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
@@ -332,6 +334,7 @@ public class AdminController {
                 .title(modifyArticleRequest.getTitle())
                 .content(modifyArticleRequest.getContent())
                 .articleType(articleType)
+                .createAt(article.getCreateAt())
                 .view(article.getView())
                 .build());
 

@@ -17,13 +17,14 @@ public class Article {
     @Column(name = "article_id")
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String title;
 
-    @Column
+    @Column(nullable = false)
+    @Lob
     private String content;
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime createAt;
 
     @OneToOne(fetch = FetchType.LAZY)
