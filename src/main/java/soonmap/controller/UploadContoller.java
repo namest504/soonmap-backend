@@ -26,7 +26,7 @@ public class UploadContoller {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PostMapping("/image")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile image) throws IOException {
-        String upload = s3Service.upload(image, "/images");
+        String upload = s3Service.upload(image, "images");
         return ResponseEntity.ok()
                 .body(CLOUD_FRONT_URL + upload);
     }
@@ -34,7 +34,7 @@ public class UploadContoller {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PostMapping("/file")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        String upload = s3Service.upload(file, "/files");
+        String upload = s3Service.upload(file, "files");
         return ResponseEntity.ok()
                 .body(CLOUD_FRONT_URL + upload);
     }
