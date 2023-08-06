@@ -16,8 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .exposedHeaders("Access-Token")
                 .allowedMethods(
                         HttpMethod.GET.name(),
-                        HttpMethod.HEAD.name(),
                         HttpMethod.POST.name(),
+                        HttpMethod.PATCH.name(),
                         HttpMethod.PUT.name(),
                         HttpMethod.DELETE.name());
     }
