@@ -17,7 +17,7 @@ public class ArticleType {
     @Column(name = "article_type_id")
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String typeName;
 
     @Column
