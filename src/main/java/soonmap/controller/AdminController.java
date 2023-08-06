@@ -492,7 +492,7 @@ public class AdminController {
         Floor floor = floorService.findOneById(floorId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "층 정보가 없습니다."));
 
-        String uploadedDir = "/floorplan/" + floor.getBuilding().getUniqueNumber();
+        String uploadedDir = "floorplan/" + floor.getBuilding().getUniqueNumber();
         String upload = s3Service.upload(image, uploadedDir);
 
         Floor save = floorService.save(Floor.builder()
