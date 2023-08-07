@@ -10,6 +10,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import soonmap.dto.ArticleDto.*;
+import soonmap.dto.ArticleTypeDto;
+import soonmap.dto.ArticleTypeDto.ArticleTypePageResponse;
+import soonmap.dto.ArticleTypeDto.ArticleTypeRequest;
 import soonmap.dto.ArticleTypeDto.ArticleTypeResponse;
 import soonmap.dto.BuildingInfoDto.*;
 import soonmap.dto.MemberDto.*;
@@ -201,19 +204,23 @@ public class AdminController {
     public ResponseEntity<?> getArticleCategory() {
 
         List<ArticleType> all = articleTypeService.findAll();
+        List<ArticleTypeResponse> result = all.stream()
+                .map(ArticleTypeResponse::of)
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok()
-                .body(all);
+                .body(result);
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
-    @GetMapping("/article/category/{id}")
-    public ResponseEntity<?> getArticleCategory(@PathVariable Long id) {
+    @GetMapping("/article/category/{name}")
+    public ResponseEntity<?> getArticleCategory(@PathVariable String name) {
 
-        ArticleType articleType = articleTypeService.findOneById(id);
+        ArticleType articleType = articleTypeService.findByTypeName(name)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."));
 
         return ResponseEntity.ok()
-                .body(articleType);
+                .body(ArticleTypeResponse.of(articleType));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
@@ -223,22 +230,25 @@ public class AdminController {
         Page<ArticleType> articleTypePage = articleTypeService.findAll(page, 10);
         int totalPages = articleTypePage.getTotalPages();
         List<ArticleType> list = articleTypePage.getContent();
+        List<ArticleTypeResponse> result = list.stream()
+                .map(ArticleTypeResponse::of)
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok()
-                .body(new ArticleTypeResponse(totalPages, list));
+                .body(new ArticleTypePageResponse(totalPages, result));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PostMapping("/article/category")
-    public ResponseEntity<?> uploadArticleCategory(@RequestBody ArticleCategoryRequest articleCategoryRequest) {
+    public ResponseEntity<?> uploadArticleCategory(@RequestBody ArticleTypeRequest ArticleTypeRequest) {
 
-        if (articleTypeService.findByTypeName(articleCategoryRequest.getName()).isPresent()) {
+        if (articleTypeService.findByTypeName(ArticleTypeRequest.getTypeName()).isPresent()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "중복된 이름의 카테고리입니다.");
         }
 
         ArticleType save = articleTypeService.save(ArticleType.builder()
-                .typeName(articleCategoryRequest.getName())
-                .description(articleCategoryRequest.getDescription())
+                .typeName(ArticleTypeRequest.getTypeName())
+                .description(ArticleTypeRequest.getDescription())
                 .build());
 
         return ResponseEntity.ok()
@@ -246,17 +256,18 @@ public class AdminController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
-    @PatchMapping("/article/category/{id}")
+    @PatchMapping("/article/category/{name}")
     public ResponseEntity<?> modifyArticleCategory(
-            @PathVariable Long id,
-            @RequestBody ArticleCategoryRequest articleCategoryRequest) {
+            @PathVariable String name,
+            @RequestBody ArticleTypeRequest articleTypeRequest) {
 
-        ArticleType articleType = articleTypeService.findOneById(id);
+        ArticleType articleType = articleTypeService.findByTypeName(name)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."));
 
         ArticleType save = articleTypeService.save(ArticleType.builder()
                 .id(articleType.getId())
-                .typeName(articleCategoryRequest.getName())
-                .description(articleCategoryRequest.getDescription())
+                .typeName(articleTypeRequest.getTypeName())
+                .description(articleTypeRequest.getDescription())
                 .build());
 
         return ResponseEntity.ok()
@@ -264,10 +275,12 @@ public class AdminController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
-    @DeleteMapping("/article/category/{id}")
-    public ResponseEntity<?> deleteArticleCategory(@PathVariable Long id) {
+    @DeleteMapping("/article/category/{name}")
+    public ResponseEntity<?> deleteArticleCategory(@PathVariable String name) {
 
-        ArticleType articleType = articleTypeService.findOneById(id);
+        ArticleType articleType = articleTypeService.findByTypeName(name)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."));
+
         Long deleteById = articleTypeService.deleteById(articleType.getId());
 
         return ResponseEntity.ok()
