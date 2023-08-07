@@ -276,6 +276,10 @@ public class AdminController {
 
         ArticleType articleType = articleTypeService.findOneById(id);
 
+        if (!articleService.findAllByArticleTypeId(articleType.getId()).isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST,"게시글이 존재하는 카테고리입니다.");
+        }
+
         Long deleteById = articleTypeService.deleteById(articleType.getId());
 
         return ResponseEntity.ok()

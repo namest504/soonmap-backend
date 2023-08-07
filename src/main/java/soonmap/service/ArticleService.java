@@ -9,6 +9,7 @@ import soonmap.entity.Article;
 import soonmap.entity.Member;
 import soonmap.repository.ArticleRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,5 +39,9 @@ public class ArticleService {
     public Long deleteById(Long id) {
         articleRepository.deleteById(id);
         return id;
+    }
+
+    public List<Article> findAllByArticleTypeId(Long id) {
+        return articleRepository.findArticlesByArticleType_Id(id);
     }
 }
