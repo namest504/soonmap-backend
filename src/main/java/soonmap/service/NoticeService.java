@@ -10,6 +10,9 @@ import soonmap.entity.Notice;
 import soonmap.exception.CustomException;
 import soonmap.repository.NoticeRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class NoticeService {
@@ -36,5 +39,20 @@ public class NoticeService {
         // todo: 공지사항 삭제 시 관련 이미지 S3 삭제 로직 필요한가?
 
         return id;
+    }
+
+    public Page<Notice> findByTitle(int page, int length, String title) {
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
+        return noticeRepository.findNoticesByTitleContaining(pageRequest, title);
+    }
+
+    public Page<Notice> findByDate(int page, int length, LocalDateTime startDate, LocalDateTime endDate) {
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
+        return noticeRepository.findNoticesByCreateAtBetween(pageRequest, startDate, endDate);
+    }
+
+    public Page<Notice> findByDateAndTitle(int page, int length, LocalDateTime startDate, LocalDateTime endDate, String title) {
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
+        return noticeRepository.findNoticesByCreateAtBetweenAndTitleContaining(pageRequest, startDate, endDate, title);
     }
 }
