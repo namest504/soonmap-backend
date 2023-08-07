@@ -377,6 +377,7 @@ public class AdminController {
                 .articleType(articleType)
                 .createAt(article.getCreateAt())
                 .view(article.getView())
+                .member(article.getMember())
                 .build());
 
         return ResponseEntity.ok()
