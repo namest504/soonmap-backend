@@ -132,9 +132,18 @@ public class AdminController {
                 .stream()
                 .map(NoticeResponse::of)
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok()
                 .body(new NoticePageResponse(all.getTotalPages(), result));
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @GetMapping("/notice/{id}")
+    public ResponseEntity<?> getPageNotice(@PathVariable Long id) {
+
+        Notice notice = noticeService.findById(id);
+
+        return ResponseEntity.ok()
+                .body(NoticeResponse.of(notice));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
@@ -195,6 +204,16 @@ public class AdminController {
 
         return ResponseEntity.ok()
                 .body(all);
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
+    @GetMapping("/article/category/{id}")
+    public ResponseEntity<?> getArticleCategory(@PathVariable Long id) {
+
+        ArticleType articleType = articleTypeService.findOneById(id);
+
+        return ResponseEntity.ok()
+                .body(articleType);
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
@@ -274,6 +293,18 @@ public class AdminController {
 
         return ResponseEntity.ok()
                 .body(new CreateNoticeResponse(true, save.getId(), save.getTitle()));
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
+    @GetMapping("/article/{id}")
+    public ResponseEntity<?> getArticle(@PathVariable Long id) {
+
+        Article article = articleService.findOneById(id)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글 입니다."));
+
+        return ResponseEntity.ok()
+                .body(ArticleResponse.of(article));
+
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
@@ -428,6 +459,19 @@ public class AdminController {
 
         return ResponseEntity.ok()
                 .body(new BuildingPageResponse(pageAll.getTotalPages(), result));
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @GetMapping("/building/{id}")
+    public ResponseEntity<?> getPageBuildingInfo(
+            @PathVariable Long id
+    ) {
+
+        Building building = buildingInfoService.findOneById(id)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 건물입니다."));
+
+        return ResponseEntity.ok()
+                .body(BuildingResponseDto.of(building));
     }
 
 
