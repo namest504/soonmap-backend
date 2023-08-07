@@ -66,12 +66,4 @@ public class ArticleDto {
         private String title;
     }
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class ArticleCategoryRequest {
-        private String name;
-        private String description;
-    }
-
 }
