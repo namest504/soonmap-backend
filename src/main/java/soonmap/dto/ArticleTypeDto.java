@@ -16,7 +16,7 @@ public class ArticleTypeDto {
     @AllArgsConstructor
     public static class ArticleTypePageResponse {
         private int totalPage;
-        private List<ArticleTypeResponse> articleTypeResponseList;
+        private List<ArticleType> articleTypeList;
     }
 
     @Getter

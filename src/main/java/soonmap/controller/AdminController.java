@@ -230,12 +230,9 @@ public class AdminController {
         Page<ArticleType> articleTypePage = articleTypeService.findAll(page, 10);
         int totalPages = articleTypePage.getTotalPages();
         List<ArticleType> list = articleTypePage.getContent();
-        List<ArticleTypeResponse> result = list.stream()
-                .map(ArticleTypeResponse::of)
-                .collect(Collectors.toList());
 
         return ResponseEntity.ok()
-                .body(new ArticleTypePageResponse(totalPages, result));
+                .body(new ArticleTypePageResponse(totalPages, list));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
