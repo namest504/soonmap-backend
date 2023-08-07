@@ -132,7 +132,6 @@ public class AdminController {
                 .stream()
                 .map(NoticeResponse::of)
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok()
                 .body(new NoticePageResponse(all.getTotalPages(), result));
     }
@@ -305,6 +304,7 @@ public class AdminController {
 
         return ResponseEntity.ok()
                 .body(ArticleResponse.of(article));
+
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
