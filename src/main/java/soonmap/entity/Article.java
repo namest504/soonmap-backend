@@ -27,11 +27,9 @@ public class Article {
     @Column(nullable = false)
     private LocalDateTime createAt;
 
-    @Column(nullable = false)
     @OneToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @Column(nullable = false)
     @OneToOne(fetch = FetchType.LAZY)
     private ArticleType articleType;
 
