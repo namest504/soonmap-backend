@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import soonmap.entity.Notice;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,8 +18,11 @@ public class NoticeDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ModifyNoticeRequest {
+        @NotBlank
         private String title;
+        @NotBlank
         private String content;
+        @NotNull
         private boolean isTop;
     }
 
@@ -35,8 +40,11 @@ public class NoticeDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateNoticeRequest {
+        @NotBlank
         private String title;
+        @NotBlank
         private String content;
+        @NotNull
         private boolean isTop;
     }
 
