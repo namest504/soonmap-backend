@@ -7,6 +7,7 @@ import soonmap.dto.ArticleDto.ArticleResponse;
 import soonmap.entity.Article;
 import soonmap.entity.ArticleType;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 public class ArticleTypeDto {
@@ -23,7 +24,9 @@ public class ArticleTypeDto {
     @Setter
     @AllArgsConstructor
     public static class ArticleTypeRequest {
+        @NotBlank
         private String typeName;
+        @NotBlank
         private String description;
     }
 

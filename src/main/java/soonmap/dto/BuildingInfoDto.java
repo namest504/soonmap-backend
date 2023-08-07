@@ -4,6 +4,8 @@ import lombok.*;
 import soonmap.entity.Building;
 import soonmap.entity.Floor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class BuildingInfoDto {
@@ -48,11 +50,17 @@ public class BuildingInfoDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BuildingRequest {
+        @NotBlank
         private String name;
+        @NotNull
         private int floors;
+        @NotBlank
         private String description;
+        @NotNull
         private double latitude; // 위도
+        @NotNull
         private double longitude; // 경도
+        @NotBlank
         private String uniqueNumber; // 고유번호
     }
 
@@ -68,7 +76,9 @@ public class BuildingInfoDto {
     @Setter
     @AllArgsConstructor
     public static class FloorRequest {
+        @NotBlank
         private String description;
+        @NotNull
         private int floorValue;
     }
 

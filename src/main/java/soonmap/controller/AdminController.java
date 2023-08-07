@@ -171,7 +171,7 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @PatchMapping("/notice/{id}")
     public ResponseEntity<?> modifyNotice(
-            @RequestBody ModifyNoticeRequest modifyNoticeRequest,
+            @RequestBody @Valid ModifyNoticeRequest modifyNoticeRequest,
             @PathVariable Long id) {
         Notice notice = noticeService.findById(id);
 
@@ -237,7 +237,7 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PostMapping("/article/category")
-    public ResponseEntity<?> uploadArticleCategory(@RequestBody ArticleTypeRequest ArticleTypeRequest) {
+    public ResponseEntity<?> uploadArticleCategory(@RequestBody @Valid ArticleTypeRequest ArticleTypeRequest) {
 
         if (articleTypeService.findByTypeName(ArticleTypeRequest.getTypeName()).isPresent()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "중복된 이름의 카테고리입니다.");
@@ -256,7 +256,7 @@ public class AdminController {
     @PatchMapping("/article/category/{id}")
     public ResponseEntity<?> modifyArticleCategory(
             @PathVariable Long id,
-            @RequestBody ArticleTypeRequest articleTypeRequest) {
+            @RequestBody @Valid ArticleTypeRequest articleTypeRequest) {
 
         ArticleType articleType = articleTypeService.findOneById(id);
 
@@ -353,7 +353,7 @@ public class AdminController {
     @PatchMapping("/article/{id}")
     public ResponseEntity<?> modifyArticle(
             @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-            @RequestBody ModifyArticleRequest modifyArticleRequest,
+            @RequestBody @Valid ModifyArticleRequest modifyArticleRequest,
             @PathVariable Long id) {
 
         Member member = memberService.findUserById(memberPrincipal.getMember().getId())
@@ -409,7 +409,7 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @PostMapping("/building")
     public ResponseEntity<?> uploadBuildingInfo(
-            @RequestBody BuildingRequest buildingRequest) {
+            @RequestBody @Valid BuildingRequest buildingRequest) {
 
         Building save = buildingInfoService.save(Building.builder()
                 .name(buildingRequest.getName())
@@ -428,7 +428,7 @@ public class AdminController {
     @PatchMapping("/building/{id}")
     public ResponseEntity<?> modifyBuildingInfo(
             @PathVariable("id") Long id,
-            @RequestBody BuildingRequest buildingRequest) {
+            @RequestBody @Valid BuildingRequest buildingRequest) {
 
         Building save = buildingInfoService.save(Building.builder()
                 .id(id)
@@ -503,7 +503,7 @@ public class AdminController {
     @PostMapping("/floor/{id}")
     public ResponseEntity<?> uploadFloor(
             @RequestParam("image") List<MultipartFile> image,
-            @RequestBody FloorRequest floorRequest,
+            @RequestBody @Valid FloorRequest floorRequest,
             @PathVariable("id") Long buildingId
     ) throws IOException {
 
@@ -543,7 +543,7 @@ public class AdminController {
     public ResponseEntity<?> modifyFloor(
             @RequestParam("image") MultipartFile image,
             @PathVariable("id") Long floorId,
-            @RequestBody FloorRequest floorRequest
+            @RequestBody @Valid FloorRequest floorRequest
     ) throws IOException {
 
         Floor floor = floorService.findOneById(floorId)

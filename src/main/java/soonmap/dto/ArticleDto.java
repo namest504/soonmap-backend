@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import soonmap.entity.Article;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -41,8 +42,11 @@ public class ArticleDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ModifyArticleRequest {
+        @NotBlank
         private String title;
+        @NotBlank
         private String content;
+        @NotBlank
         private String articleTypeName;
     }
 
@@ -51,8 +55,11 @@ public class ArticleDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateArticleRequest {
+        @NotBlank
         private String title;
+        @NotBlank
         private String content;
+        @NotBlank
         private String articleTypeName;
     }
 
