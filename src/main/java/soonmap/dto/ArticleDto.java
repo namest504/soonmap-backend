@@ -43,8 +43,7 @@ public class ArticleDto {
     public static class ModifyArticleRequest {
         private String title;
         private String content;
-        private LocalDateTime createAt;
-        private Long articleTypeId;
+        private String articleTypeName;
     }
 
     @Getter
@@ -54,7 +53,7 @@ public class ArticleDto {
     public static class CreateArticleRequest {
         private String title;
         private String content;
-        private Long articleTypeId;
+        private String articleTypeName;
     }
 
     @Getter

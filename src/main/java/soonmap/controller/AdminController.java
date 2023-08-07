@@ -256,13 +256,12 @@ public class AdminController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
-    @PatchMapping("/article/category/{name}")
+    @PatchMapping("/article/category/{id}")
     public ResponseEntity<?> modifyArticleCategory(
-            @PathVariable String name,
+            @PathVariable Long id,
             @RequestBody ArticleTypeRequest articleTypeRequest) {
 
-        ArticleType articleType = articleTypeService.findByTypeName(name)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."));
+        ArticleType articleType = articleTypeService.findOneById(id);
 
         ArticleType save = articleTypeService.save(ArticleType.builder()
                 .id(articleType.getId())
@@ -275,11 +274,10 @@ public class AdminController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
-    @DeleteMapping("/article/category/{name}")
-    public ResponseEntity<?> deleteArticleCategory(@PathVariable String name) {
+    @DeleteMapping("/article/category/{id}")
+    public ResponseEntity<?> deleteArticleCategory(@PathVariable Long id) {
 
-        ArticleType articleType = articleTypeService.findByTypeName(name)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."));
+        ArticleType articleType = articleTypeService.findOneById(id);
 
         Long deleteById = articleTypeService.deleteById(articleType.getId());
 
@@ -293,7 +291,8 @@ public class AdminController {
             @AuthenticationPrincipal MemberPrincipal memberPrincipal,
             @RequestBody @Valid CreateArticleRequest createArticleRequest) {
 
-        ArticleType articleType = articleTypeService.findOneById(createArticleRequest.getArticleTypeId());
+        ArticleType articleType = articleTypeService.findByTypeName(createArticleRequest.getArticleTypeName())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리 입니다."));
 
         Article save = articleService.save(Article.builder()
                 .title(createArticleRequest.getTitle())
@@ -371,7 +370,8 @@ public class AdminController {
                 throw new CustomException(HttpStatus.UNAUTHORIZED, "게시글 수정 권한이 없습니다.");
             }
         }
-        ArticleType articleType = articleTypeService.findOneById(modifyArticleRequest.getArticleTypeId());
+        ArticleType articleType = articleTypeService.findByTypeName(modifyArticleRequest.getArticleTypeName())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리 입니다."));
 
         Article save = articleService.save(Article.builder()
                 .id(id)
