@@ -99,6 +99,11 @@ public class AdminController {
                 .body(new AdminResisterResponse(true, member.isAdmin(), member.isManager(), member.isStaff()));
     }
 
+    @GetMapping("/logout")
+    public ResponseEntity<?> logoutAdmin(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+        Boolean result = memberService.logoutAdminRefreshToken(memberPrincipal.getMember().getId());
+        return ResponseEntity.ok(result);
+    }
     @Secured("ROLE_ADMIN")
     @GetMapping("/account/admin")
     public ResponseEntity<AccountListResponse> getAdminAccount() {
