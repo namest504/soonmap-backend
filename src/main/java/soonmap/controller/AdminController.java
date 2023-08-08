@@ -3,6 +3,7 @@ package soonmap.controller;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -131,11 +132,11 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/notice/search")
     public ResponseEntity<?> searchNotice(
-            @RequestParam(required = false) Optional<LocalDateTime> startDate,
-            @RequestParam(required = false) Optional<LocalDateTime> endDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Optional<LocalDateTime> startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Optional<LocalDateTime> endDate,
             @RequestParam(required = false) Optional<String> title,
             @RequestParam int page
-    ){
+    ) {
 
         List<NoticeResponse> noticeResponseList;
         int totalPage;
@@ -153,12 +154,18 @@ public class AdminController {
                 noticeResponseList = getCollect(byDate);
                 totalPage = byDate.getTotalPages();
             }
-        } else {
+        } else if (title.isPresent()) {
             // 제목만 존재할 때
             Page<Notice> byTitle = noticeService.findByTitle(page, 9, title.get());
             noticeResponseList = getCollect(byTitle);
             totalPage = byTitle.getTotalPages();
+        } else {
+            // 전부 존재하지 않을 때
+            Page<Notice> all = noticeService.findAll(page, 9);
+            noticeResponseList = getCollect(all);
+            totalPage = all.getTotalPages();
         }
+
         return ResponseEntity.ok()
                 .body(new NoticePageResponse(totalPage, noticeResponseList));
     }
@@ -317,7 +324,7 @@ public class AdminController {
         ArticleType articleType = articleTypeService.findOneById(id);
 
         if (!articleService.findAllByArticleTypeId(articleType.getId()).isEmpty()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST,"게시글이 존재하는 카테고리입니다.");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "게시글이 존재하는 카테고리입니다.");
         }
 
         Long deleteById = articleTypeService.deleteById(articleType.getId());
