@@ -242,12 +242,12 @@ public class AdminController {
     public ResponseEntity<?> getArticleCategory() {
 
         List<ArticleType> all = articleTypeService.findAll();
-        List<ArticleTypeResponse> result = all.stream()
-                .map(ArticleTypeResponse::of)
-                .collect(Collectors.toList());
+//        List<ArticleTypeResponse> result = all.stream()
+//                .map(ArticleTypeResponse::of)
+//                .collect(Collectors.toList());
 
         return ResponseEntity.ok()
-                .body(result);
+                .body(all);
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
