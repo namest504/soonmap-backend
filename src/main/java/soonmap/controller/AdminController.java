@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -130,30 +131,31 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/notice/search")
     public ResponseEntity<?> searchNotice(
-            @RequestParam LocalDateTime startDate,
-            @RequestParam LocalDateTime endDate,
-            @RequestParam String title,
+            @RequestParam(required = false) Optional<LocalDateTime> startDate,
+            @RequestParam(required = false) Optional<LocalDateTime> endDate,
+            @RequestParam(required = false) Optional<String> title,
             @RequestParam int page
     ){
 
         List<NoticeResponse> noticeResponseList;
         int totalPage;
 
-        if (startDate != null && endDate != null) {
-            if (title != null && !title.isEmpty()) {
+        if (startDate.isPresent() && endDate.isPresent()) {
+            if (title.isPresent()) {
                 // 시작일, 종료일, 제목 모두 존재할 때
-                Page<Notice> byDateAndTitle = noticeService.findByDateAndTitle(page, 9, startDate, endDate, title);
+
+                Page<Notice> byDateAndTitle = noticeService.findByDateAndTitle(page, 9, startDate.get(), endDate.get(), title.get());
                 noticeResponseList = getCollect(byDateAndTitle);
                 totalPage = byDateAndTitle.getTotalPages();
             } else {
                 // 시작일, 종료일만 존재할 때
-                Page<Notice> byDate = noticeService.findByDate(page, 9, startDate, endDate);
+                Page<Notice> byDate = noticeService.findByDate(page, 9, startDate.get(), endDate.get());
                 noticeResponseList = getCollect(byDate);
                 totalPage = byDate.getTotalPages();
             }
         } else {
             // 제목만 존재할 때
-            Page<Notice> byTitle = noticeService.findByTitle(page, 9, title);
+            Page<Notice> byTitle = noticeService.findByTitle(page, 9, title.get());
             noticeResponseList = getCollect(byTitle);
             totalPage = byTitle.getTotalPages();
         }
