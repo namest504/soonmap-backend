@@ -62,7 +62,7 @@ public class NoticeDto {
     @AllArgsConstructor
     public static class NoticePageResponse {
         private int totalPage;
-        private List<NoticeResponse> articleTypeList;
+        private List<NoticeResponse> noticeList;
     }
 
     @Getter
