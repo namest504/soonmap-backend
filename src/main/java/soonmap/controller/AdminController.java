@@ -334,6 +334,25 @@ public class AdminController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
+    @GetMapping("/article/search")
+    public ResponseEntity<?> searchArticles(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime endDate,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String typeName,
+            @RequestParam int page
+    ) {
+        Page<Article> articlesByConditionWithPaging = articleService.findArticlesByConditionWithPaging(page, 9, typeName, startDate, endDate, title);
+        List<ArticleResponse> articleResponseList = articlesByConditionWithPaging.getContent()
+                .stream()
+                .map(ArticleResponse::of)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok()
+                .body(new ArticlePageResponse(articlesByConditionWithPaging.getTotalPages(), articleResponseList));
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PostMapping("/article")
     public ResponseEntity<?> uploadArticle(
             @AuthenticationPrincipal MemberPrincipal memberPrincipal,
