@@ -617,9 +617,9 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @PatchMapping("/floor/{id}")
     public ResponseEntity<?> modifyFloor(
-            @RequestParam("image") MultipartFile image,
+            @RequestPart("image") MultipartFile image,
             @PathVariable("id") Long floorId,
-            @RequestBody @Valid FloorRequest floorRequest
+            @RequestPart @Valid FloorRequest floorRequest
     ) throws IOException {
 
         Floor floor = floorService.findOneById(floorId)
