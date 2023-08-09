@@ -24,7 +24,7 @@ public class ArticleQuerydslRepository {
 
         List<Article> articleList = queryFactory
                 .selectFrom(article)
-                .where(typeNameEq(typeName), dateBetween(startDate, endDate), titleContains(title))
+                .where(typeNameContains(typeName), dateBetween(startDate, endDate), titleContains(title))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -32,8 +32,8 @@ public class ArticleQuerydslRepository {
         return new PageImpl<>(articleList, pageable, articleList.size());
     }
 
-    private BooleanExpression typeNameEq(String typeName) {
-        return typeName != null ? article.articleType.typeName.eq(typeName) : null;
+    private BooleanExpression typeNameContains(String typeName) {
+        return typeName != null ? article.articleType.typeName.contains(typeName) : null;
     }
 
     private BooleanExpression dateBetween(LocalDateTime startDate, LocalDateTime endDate) {
