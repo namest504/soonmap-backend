@@ -23,7 +23,7 @@ public class Building {
     @Column(nullable = false)
     private int floors; // 건물이 몇 층까지 있는지 정보를 저장하는 칼럼입니다.
 
-    @OneToMany(mappedBy = "building", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "building", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Floor> floor_info;
 
     @Column(nullable = false)
