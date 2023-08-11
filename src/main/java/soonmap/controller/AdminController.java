@@ -29,7 +29,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -580,67 +579,55 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @PostMapping("/floor/{id}")
     public ResponseEntity<?> uploadFloor(
-            @RequestPart(value = "image") List<MultipartFile> image,
+            @RequestParam(value = "image") MultipartFile image,
+            @RequestParam("floor-value") int floorValue,
             @PathVariable("id") Long buildingId
     ) throws IOException {
 
         Building building = buildingInfoService.findOneById(buildingId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "건물 정보가 없습니다."));
 
-        if (image.size() == 1 && image.get(0).isEmpty()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "이미지 정보가 없습니다.");
+        if (floorService.isExistFloorWithBuildingId(floorValue, building.getId())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "해당 층의 도면이 이미 존재합니다.");
         }
-        List<FloorResponse> floorResponseList = new ArrayList<>();
 
-        for (MultipartFile multipartFile : image) {
+        String uploadedDir = "floorplan/" + building.getUniqueNumber();
+        String uploadResult = s3Service.upload(image, uploadedDir);
 
-            if (multipartFile.isEmpty()) {
-
-                Floor save = floorService.save(Floor.builder()
-                        .dir(null)
-                        .building(building)
-                        .floorValue(image.indexOf(multipartFile) + 1)
-                        .build());
-
-                floorResponseList.add(FloorResponse.of(save));
-            } else {
-                String uploadedDir = "floorplan/" + building.getUniqueNumber();
-                String uploadResult = s3Service.upload(multipartFile, uploadedDir);
-
-                Floor save = floorService.save(Floor.builder()
-                        .dir(uploadResult)
-                        .building(building)
-                        .floorValue(image.indexOf(multipartFile) + 1)
-                        .build());
-
-                floorResponseList.add(FloorResponse.of(save));
-            }
-        }
+        Floor save = floorService.save(Floor.builder()
+                .dir(uploadResult)
+                .building(building)
+                .floorValue(floorValue)
+                .build());
 
         return ResponseEntity.ok()
-                .body(floorResponseList);
+                .body(FloorResponse.of(save));
+
     }
 
     @Secured("ROLE_ADMIN")
     @PatchMapping("/floor/{id}")
     public ResponseEntity<?> modifyFloor(
             @RequestPart("image") MultipartFile image,
-            @PathVariable("id") Long floorId,
-            @RequestPart @Valid FloorRequest floorRequest
+            @RequestParam("floor-value") int floorValue,
+            @PathVariable("id") Long floorId
     ) throws IOException {
 
         Floor floor = floorService.findOneById(floorId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "층 정보가 없습니다."));
+
+        if (floorService.isExistFloor(floorValue)) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "해당 층의 도면이 존재하지 않습니다.");
+        }
 
         String uploadedDir = "floorplan/" + floor.getBuilding().getUniqueNumber();
         String upload = s3Service.upload(image, uploadedDir);
 
         Floor save = floorService.save(Floor.builder()
                 .id(floor.getId())
-                .description(floorRequest.getDescription())
                 .dir(upload)
                 .building(floor.getBuilding())
-                .floorValue(floorRequest.getFloorValue())
+                .floorValue(floorValue)
                 .build());
 
         return ResponseEntity.ok()

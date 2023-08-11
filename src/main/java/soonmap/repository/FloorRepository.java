@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface FloorRepository extends JpaRepository<Floor, Long> {
     List<Floor> findFloorByBuilding_Id(Long buildingId);
+
+    Boolean existsFloorByFloorValue(int floorValue);
+    Boolean existsFloorByFloorValueAndBuilding_Id(int floorValue, Long building_id);
 }
