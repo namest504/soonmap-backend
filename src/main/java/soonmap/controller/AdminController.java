@@ -580,7 +580,7 @@ public class AdminController {
     @PostMapping("/floor/{id}")
     public ResponseEntity<?> uploadFloor(
             @RequestParam(value = "image") MultipartFile image,
-            @RequestParam("floor-value") int floorValue,
+            @RequestParam int floorValue,
             @PathVariable("id") Long buildingId
     ) throws IOException {
 
@@ -609,7 +609,7 @@ public class AdminController {
     @PatchMapping("/floor/{id}")
     public ResponseEntity<?> modifyFloor(
             @RequestPart("image") MultipartFile image,
-            @RequestParam("floor-value") int floorValue,
+            @RequestParam int floorValue,
             @PathVariable("id") Long floorId
     ) throws IOException {
 
