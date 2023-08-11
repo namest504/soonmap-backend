@@ -106,7 +106,7 @@ public class AdminController {
         return ResponseEntity.ok(result);
     }
 
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/account/admin")
     public ResponseEntity<AccountListResponse> getAdminAccount() {
         List<Member> adminAccount = memberService.findAdminAccount();
@@ -115,7 +115,7 @@ public class AdminController {
                 .body(new AccountListResponse(adminAccount.size(), collect));
     }
 
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/account/all")
     public ResponseEntity<AccountListResponse> getAllAccount() {
         List<Member> adminAccount = memberService.findAll();
@@ -124,7 +124,7 @@ public class AdminController {
                 .body(new AccountListResponse(adminAccount.size(), collect));
     }
 
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @PatchMapping("/manage/ban")
     public ResponseEntity<Account> modifyIsBanAccount(@RequestParam Long id) {
         Member member = memberService.findUserById(id)
@@ -484,7 +484,7 @@ public class AdminController {
                 .body(deleteById);
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @Secured("ROLE_ADMIN")
     @PostMapping("/building")
     public ResponseEntity<?> uploadBuildingInfo(
             @RequestBody @Valid BuildingRequest buildingRequest) {
@@ -502,7 +502,7 @@ public class AdminController {
                 .body(save);
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @Secured("ROLE_ADMIN")
     @PatchMapping("/building/{id}")
     public ResponseEntity<?> modifyBuildingInfo(
             @PathVariable("id") Long id,
@@ -522,7 +522,7 @@ public class AdminController {
                 .body(save);
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @Secured("ROLE_ADMIN")
     @DeleteMapping("/building/{id}")
     public ResponseEntity<?> deleteBuildingInfo(
             @PathVariable("id") Long id) {
@@ -533,7 +533,7 @@ public class AdminController {
                 .body(deleteById);
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @Secured("ROLE_ADMIN")
     @GetMapping("/building")
     public ResponseEntity<?> getPageBuildingInfo(
             @RequestParam int page
@@ -549,7 +549,7 @@ public class AdminController {
                 .body(new BuildingPageResponse(pageAll.getTotalPages(), result));
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @Secured("ROLE_ADMIN")
     @GetMapping("/building/{id}")
     public ResponseEntity<?> getPageBuildingInfo(
             @PathVariable Long id
@@ -563,7 +563,7 @@ public class AdminController {
     }
 
 
-    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @Secured("ROLE_ADMIN")
     @GetMapping("/floor")
     public ResponseEntity<?> getFloors(
             @RequestParam Long buildingId) {
@@ -577,7 +577,7 @@ public class AdminController {
                 .body(floorByBuilding);
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @Secured("ROLE_ADMIN")
     @PostMapping("/floor/{id}")
     public ResponseEntity<?> uploadFloor(
             @RequestPart(value = "image") List<MultipartFile> image,
@@ -621,7 +621,7 @@ public class AdminController {
                 .body(floorResponseList);
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @Secured("ROLE_ADMIN")
     @PatchMapping("/floor/{id}")
     public ResponseEntity<?> modifyFloor(
             @RequestPart("image") MultipartFile image,
@@ -647,7 +647,7 @@ public class AdminController {
                 .body(FloorResponse.of(save));
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @Secured("ROLE_ADMIN")
     @DeleteMapping("/floor/{id}")
     public ResponseEntity<?> deleteFloor(@PathVariable("id") Long id) {
 
