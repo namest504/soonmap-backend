@@ -30,4 +30,12 @@ public class FloorService {
         floorRepository.deleteById(id);
         return id;
     }
+
+    public Boolean isExistFloor(int floorValue) {
+        return floorRepository.existsFloorByFloorValue(floorValue);
+    }
+
+    public Boolean isExistFloorWithBuildingId(int floorValue, Long buildingId) {
+        return floorRepository.existsFloorByFloorValueAndBuilding_Id(floorValue, buildingId);
+    }
 }
