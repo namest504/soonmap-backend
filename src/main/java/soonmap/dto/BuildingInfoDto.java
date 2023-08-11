@@ -87,13 +87,14 @@ public class BuildingInfoDto {
     @Setter
     @AllArgsConstructor
     public static class FloorResponse {
+        private Long id;
         private String description;
         private String dir;
         private int floorValue;
         private String uniqueNumber;
 
         public static FloorResponse of(Floor floor) {
-            return new FloorResponse(floor.getDescription(), floor.getDir(), floor.getFloorValue(), floor.getBuilding().getUniqueNumber());
+            return new FloorResponse(floor.getId(), floor.getDescription(), floor.getDir(), floor.getFloorValue(), floor.getBuilding().getUniqueNumber());
         }
     }
 }
