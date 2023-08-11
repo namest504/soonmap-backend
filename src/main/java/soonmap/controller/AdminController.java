@@ -2,6 +2,7 @@ package soonmap.controller;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import soonmap.dto.ArticleDto.*;
-import soonmap.dto.ArticleTypeDto;
 import soonmap.dto.ArticleTypeDto.ArticleTypePageResponse;
 import soonmap.dto.ArticleTypeDto.ArticleTypeRequest;
 import soonmap.dto.ArticleTypeDto.ArticleTypeResponse;
@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
@@ -104,6 +105,7 @@ public class AdminController {
         Boolean result = memberService.logoutAdminRefreshToken(memberPrincipal.getMember().getId());
         return ResponseEntity.ok(result);
     }
+
     @Secured("ROLE_ADMIN")
     @GetMapping("/account/admin")
     public ResponseEntity<AccountListResponse> getAdminAccount() {
@@ -578,40 +580,45 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @PostMapping("/floor/{id}")
     public ResponseEntity<?> uploadFloor(
-            @RequestParam("image") List<MultipartFile> image,
-            @RequestBody @Valid FloorRequest floorRequest,
+            @RequestPart(value = "image") List<MultipartFile> image,
             @PathVariable("id") Long buildingId
     ) throws IOException {
 
         Building building = buildingInfoService.findOneById(buildingId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "건물 정보가 없습니다."));
 
-        ArrayList<Floor> floorArrayList = new ArrayList<>();
+        if (image.size() == 1 && image.get(0).isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "이미지 정보가 없습니다.");
+        }
+        List<FloorResponse> floorResponseList = new ArrayList<>();
 
         for (MultipartFile multipartFile : image) {
-            if (!multipartFile.isEmpty()) {
 
-                String uploadedDir = "/floorplan/" + building.getUniqueNumber();
-                String upload = s3Service.upload(multipartFile, uploadedDir);
+            if (multipartFile.isEmpty()) {
 
                 Floor save = floorService.save(Floor.builder()
-                        .description(floorRequest.getDescription())
-                        .dir(upload)
+                        .dir(null)
                         .building(building)
-                        .floorValue(floorRequest.getFloorValue())
+                        .floorValue(image.indexOf(multipartFile) + 1)
                         .build());
 
-                floorArrayList.add(save);
+                floorResponseList.add(FloorResponse.of(save));
+            } else {
+                String uploadedDir = "floorplan/" + building.getUniqueNumber();
+                String uploadResult = s3Service.upload(multipartFile, uploadedDir);
+
+                Floor save = floorService.save(Floor.builder()
+                        .dir(uploadResult)
+                        .building(building)
+                        .floorValue(image.indexOf(multipartFile) + 1)
+                        .build());
+
+                floorResponseList.add(FloorResponse.of(save));
             }
         }
 
-        List<FloorResponse> result = floorArrayList
-                .stream()
-                .map(FloorResponse::of)
-                .collect(Collectors.toList());
-
         return ResponseEntity.ok()
-                .body(result);
+                .body(floorResponseList);
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
