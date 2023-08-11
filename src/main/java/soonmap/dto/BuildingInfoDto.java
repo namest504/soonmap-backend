@@ -24,6 +24,7 @@ public class BuildingInfoDto {
     @Data
     @AllArgsConstructor
     public static class BuildingResponseDto { // building의 정보를 반환할때 사용하는 dto입니다. 이름과 층, 설명을 반환합니다.
+        private Long id;
         private String name;
         private int floors;
         private String description;
@@ -41,7 +42,7 @@ public class BuildingInfoDto {
         }
 
         public static BuildingResponseDto of(Building building) {
-            return new BuildingResponseDto(building.getName(), building.getFloors(), building.getDescription(), building.getLatitude(), building.getLongitude(), building.getUniqueNumber());
+            return new BuildingResponseDto(building.getId(), building.getName(), building.getFloors(), building.getDescription(), building.getLatitude(), building.getLongitude(), building.getUniqueNumber());
         }
     }
 
