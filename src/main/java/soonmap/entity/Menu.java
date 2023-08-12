@@ -18,6 +18,10 @@ public class Menu {
     private String menuName;
     @Column(nullable = false)
     private String menuImageURL;
+    @Column(nullable = false)
+    private String menuDescription;
+    @Column(nullable = false)
+    private String menuPrice;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;

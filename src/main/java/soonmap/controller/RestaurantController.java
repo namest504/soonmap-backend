@@ -56,10 +56,10 @@ public class RestaurantController {
     }
 
     @PostMapping("/restaurant/save")
-    public ResponseEntity<Restaurant> uploadRestaurant(@RequestBody RestaurantRequestDto restaurantRequestDto) {
+    public ResponseEntity<String> uploadRestaurant(@RequestBody RestaurantRequestDto restaurantRequestDto) {
         Restaurant restaurant = restaurantRequestDto.to_Entity();
         restaurantService.saveRestaurant(restaurant);
-        return ResponseEntity.ok(restaurant);
+        return ResponseEntity.ok("restaurant 저장 성공");
     }
 
     @PostMapping("/restaurant/{id}")
@@ -79,7 +79,7 @@ public class RestaurantController {
         menu.setRestaurant(restaurant);
         menu.setMenuImageURL(uploadDir);
         menuService.save(menu);
-        return ResponseEntity.ok(menu);
+        return ResponseEntity.ok("menu 저장 성공");
     }
 }
 
