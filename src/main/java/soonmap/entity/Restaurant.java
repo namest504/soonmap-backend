@@ -17,6 +17,8 @@ public class Restaurant {
     private Long id;
     @Column(nullable = false)
     private String restaurantName;
+    @Column
+    private String phoneNumber;
     @Column(nullable = false)
     private double latitude;
     @Column(nullable = false)

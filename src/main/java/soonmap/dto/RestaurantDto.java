@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import soonmap.entity.Menu;
 import soonmap.entity.Restaurant;
 
+import javax.persistence.Column;
+
 public class RestaurantDto {
     @Data
     @AllArgsConstructor
@@ -15,12 +17,14 @@ public class RestaurantDto {
         private String restaurantName;
         private double latitude;
         private double longtitude;
+        private String phoneNumber;
 
         public Restaurant to_Entity() {
             return Restaurant.builder()
                     .restaurantName(restaurantName)
                     .latitude(latitude)
                     .longtitude(longtitude)
+                    .phoneNumber(phoneNumber)
                     .build();
         }
     }
@@ -33,12 +37,14 @@ public class RestaurantDto {
         private String restaurantName;
         private double latitude;
         private double longtitude;
+        private String phoneNumber;
 
         public RestaurantResponseDto(Restaurant restaurant) {
             this.id = restaurant.getId();
             this.restaurantName = restaurant.getRestaurantName();
             this.latitude = restaurant.getLatitude();
             this.longtitude = restaurant.getLongtitude();
+            this.phoneNumber = restaurant.getPhoneNumber();
         }
     }
     @Data
@@ -47,11 +53,17 @@ public class RestaurantDto {
     public static class MenuRequestDto {
         private String menuName;
         private String menuImageURL;
+        private String menuDescription;
+        private String menuPrice;
+
+
 
         public Menu to_Entity() {
             return Menu.builder()
                     .menuName(menuName)
                     .menuImageURL(menuImageURL)
+                    .menuDescription(menuDescription)
+                    .menuPrice(menuPrice)
                     .build();
         }
     }
@@ -62,11 +74,16 @@ public class RestaurantDto {
     public static class MenuResponseDto {
         private String menuName;
         private String menuImageURL;
+        private String menuDescription;
+        private String menuPrice;
+
+
 
         public MenuResponseDto(Menu menu) {
             this.menuName = menu.getMenuName();
             this.menuImageURL = menu.getMenuImageURL();
+            this.menuDescription = menu.getMenuDescription();
+            this.menuPrice = menu.getMenuPrice();
         }
     }
-
 }
