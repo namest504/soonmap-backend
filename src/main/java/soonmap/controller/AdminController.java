@@ -128,8 +128,9 @@ public class AdminController {
     public ResponseEntity<Account> modifyIsBanAccount(@RequestParam Long id) {
         Member member = memberService.findUserById(id)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
-        ;
-        member.setBan(!member.isBan());
+
+//        member.setBan(!member.isBan());
+        member.updateBan();
         Member savedUser = memberService.editUser(member);
         return ResponseEntity.ok()
                 .body(Account.of(savedUser));
@@ -571,9 +572,12 @@ public class AdminController {
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "건물 정보가 없습니다."));
 
         List<Floor> floorByBuilding = floorService.findFloorByBuilding(building.getId());
+        List<FloorResponse> collect = floorByBuilding.stream()
+                .map(FloorResponse::of)
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok()
-                .body(floorByBuilding);
+                .body(collect);
     }
 
     @Secured("ROLE_ADMIN")

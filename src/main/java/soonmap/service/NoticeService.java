@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import soonmap.entity.Notice;
 import soonmap.exception.CustomException;
+import soonmap.repository.NoticeQueryDslRepository;
 import soonmap.repository.NoticeRepository;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.List;
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
+    private final NoticeQueryDslRepository noticeQueryDslRepository;
 
     public Notice save(Notice notice) {
         return noticeRepository.save(notice);
@@ -54,5 +56,18 @@ public class NoticeService {
     public Page<Notice> findByDateAndTitle(int page, int length, LocalDateTime startDate, LocalDateTime endDate, String title) {
         PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
         return noticeRepository.findNoticesByCreateAtBetweenAndTitleContaining(pageRequest, startDate, endDate, title);
+    }
+
+    public List<Notice> findAllByTop() {
+        return noticeQueryDslRepository.findAllByTop();
+    }
+
+    public List<Notice> findMain() {
+        return noticeQueryDslRepository.findMainNotice();
+    }
+
+    public Page<Notice> findNormal(int page, int length, String title) {
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return noticeQueryDslRepository.findNormalNotice(pageRequest, title);
     }
 }
