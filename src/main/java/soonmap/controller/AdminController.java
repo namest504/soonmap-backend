@@ -3,6 +3,7 @@ package soonmap.controller;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController {
+
+    @Value("${CLOUD_FRONT_URL}")
+    private String CLOUD_FRONT_URL;
 
     private final S3Service s3Service;
     private final MemberService memberService;
@@ -572,8 +576,9 @@ public class AdminController {
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "건물 정보가 없습니다."));
 
         List<Floor> floorByBuilding = floorService.findFloorByBuilding(building.getId());
-        List<FloorResponse> collect = floorByBuilding.stream()
+        List<URLAddedFloorResponse> collect = floorByBuilding.stream()
                 .map(FloorResponse::of)
+                .map(s -> URLAddedFloorResponse.addURL(CLOUD_FRONT_URL, s))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok()
