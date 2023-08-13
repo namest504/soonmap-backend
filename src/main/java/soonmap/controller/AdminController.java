@@ -625,9 +625,9 @@ public class AdminController {
         Floor floor = floorService.findOneById(floorId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "층 정보가 없습니다."));
 
-        if (floorService.isExistFloor(floorValue)) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "해당 층의 도면이 존재하지 않습니다.");
-        }
+//        if (floorService.isExistFloor(floorValue)) {
+//            throw new CustomException(HttpStatus.BAD_REQUEST, "해당 층의 도면이 존재하지 않습니다.");
+//        }
 
         String uploadedDir = "floorplan/" + floor.getBuilding().getUniqueNumber();
         String upload = s3Service.upload(image, uploadedDir);
