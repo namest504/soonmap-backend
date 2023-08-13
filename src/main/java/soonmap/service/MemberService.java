@@ -99,6 +99,7 @@ public class MemberService implements UserDetailsService {
     public Member editUser(Member member) {
         return memberRepository.save(Member.builder()
                 .id(member.getId())
+                .userId(member.getUserId())
                 .userName(member.getUsername())
                 .userEmail(member.getUserEmail())
                 .userPassword(member.getUserPassword())
