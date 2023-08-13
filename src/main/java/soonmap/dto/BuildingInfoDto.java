@@ -97,4 +97,19 @@ public class BuildingInfoDto {
             return new FloorResponse(floor.getId(), floor.getDescription(), floor.getDir(), floor.getFloorValue(), floor.getBuilding().getUniqueNumber());
         }
     }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class URLAddedFloorResponse {
+        private Long id;
+        private String description;
+        private String dir;
+        private int floorValue;
+        private String uniqueNumber;
+
+        public static URLAddedFloorResponse addURL(String link, FloorResponse floorResponse) {
+            return new URLAddedFloorResponse(floorResponse.getId(), floorResponse.getDescription(), link + floorResponse.getDir(), floorResponse.getFloorValue(), floorResponse.getUniqueNumber());
+        }
+    }
 }
