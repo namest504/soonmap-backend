@@ -618,7 +618,6 @@ public class AdminController {
     @PatchMapping("/floor/{id}")
     public ResponseEntity<?> modifyFloor(
             @RequestPart("image") MultipartFile image,
-            @RequestParam int floorValue,
             @PathVariable("id") Long floorId
     ) throws IOException {
 
@@ -636,7 +635,7 @@ public class AdminController {
                 .id(floor.getId())
                 .dir(upload)
                 .building(floor.getBuilding())
-                .floorValue(floorValue)
+                .floorValue(floor.getFloorValue())
                 .build());
 
         return ResponseEntity.ok()
