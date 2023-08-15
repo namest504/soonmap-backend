@@ -34,9 +34,9 @@ public class ArticleService {
         return articleRepository.findAll(pageRequest);
     }
 
-    public Page<Article> findAllByMember(Member member, int page, int length) {
+    public Page<Article> findAllByMember(Long memberId, int page, int length) {
         PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        return articleRepository.findAllByMember(member, pageRequest);
+        return articleQuerydslRepository.findAllByMemberId(memberId, pageRequest);
     }
 
     public Long deleteById(Long id) {
