@@ -79,4 +79,20 @@ public class ArticleQuerydslRepository {
 
         return result;
     }
+
+    public Page<Article> findAllByMemberId(Long memberId, Pageable pageable) {
+        List<Article> articleList = queryFactory
+                .selectFrom(article)
+                .where(article.member.id.eq(memberId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long countArticle = queryFactory.select(article.count())
+                .from(article)
+                .where(article.member.id.eq(memberId))
+                .fetchOne();
+
+        return new PageImpl<>(articleList, pageable, countArticle);
+    }
 }

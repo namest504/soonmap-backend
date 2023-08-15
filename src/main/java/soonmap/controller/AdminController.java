@@ -419,7 +419,7 @@ public class AdminController {
 
         Member member = memberService.findUserById(memberPrincipal.getMember().getId())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "인증되지 않은 유저 입니다."));
-        Page<Article> articles = articleService.findAllByMember(member, page, 9);
+        Page<Article> articles = articleService.findAllByMember(member.getId(), page, 9);
         List<ArticleResponse> articleResponseList = articles
                 .getContent()
                 .stream()
