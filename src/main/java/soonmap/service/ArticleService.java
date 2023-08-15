@@ -49,7 +49,11 @@ public class ArticleService {
     }
 
     public Page<Article> findArticlesByConditionWithPaging(int page, int length ,String typeName, LocalDateTime startDate, LocalDateTime endDate, String title) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
         return articleQuerydslRepository.findArticlesByCondition(typeName,startDate,endDate,title,pageRequest);
+    }
+
+    public List<Article> findMainArticles() {
+        return articleQuerydslRepository.findMainArticles();
     }
 }
