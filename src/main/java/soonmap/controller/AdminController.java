@@ -198,6 +198,20 @@ public class AdminController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @GetMapping("/notice/my")
+    public ResponseEntity<?> getPageMyNotice(@RequestParam("page") int page,
+                                             @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+        Page<Notice> all = noticeService.findAllByMember(page, 9, memberPrincipal.getMember().getId());
+        List<NoticeResponse> collect = all.getContent()
+                .stream()
+                .map(NoticeResponse::of)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok()
+                .body(new NoticePageResponse(all.getTotalPages(), collect));
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/notice/{id}")
     public ResponseEntity<?> getPageNotice(@PathVariable Long id) {
 
