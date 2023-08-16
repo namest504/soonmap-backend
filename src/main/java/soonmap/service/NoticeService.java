@@ -44,17 +44,17 @@ public class NoticeService {
     }
 
     public Page<Notice> findByTitle(int page, int length, String title) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
         return noticeRepository.findNoticesByTitleContaining(pageRequest, title);
     }
 
     public Page<Notice> findByDate(int page, int length, LocalDateTime startDate, LocalDateTime endDate) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
         return noticeRepository.findNoticesByCreateAtBetween(pageRequest, startDate, endDate);
     }
 
     public Page<Notice> findByDateAndTitle(int page, int length, LocalDateTime startDate, LocalDateTime endDate, String title) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
         return noticeRepository.findNoticesByCreateAtBetweenAndTitleContaining(pageRequest, startDate, endDate, title);
     }
 
@@ -69,5 +69,10 @@ public class NoticeService {
     public Page<Notice> findNormal(int page, int length, String title) {
         PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
         return noticeQueryDslRepository.findNormalNotice(pageRequest, title);
+    }
+
+    public Page<Notice> findAllByMember(int page, int length, Long memberId) {
+        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return noticeQueryDslRepository.findAllByMemberId(memberId, pageRequest);
     }
 }
