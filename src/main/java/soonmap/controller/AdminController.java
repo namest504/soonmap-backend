@@ -58,8 +58,7 @@ public class AdminController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<AdminLoginResponse> adminLogin(
-            @RequestBody @Valid AdminLoginRequest adminLoginRequest) {
+    public ResponseEntity<AdminLoginResponse> adminLogin(@RequestBody @Valid AdminLoginRequest adminLoginRequest) {
         Member member = memberService.loginAdmin(adminLoginRequest);
         String accessToken = jwtProvider.createAccessToken(member.getId());
         String refreshToken = jwtProvider.createRefreshToken(member.getId());
@@ -133,7 +132,7 @@ public class AdminController {
     }
 
     @PostMapping("/find/id/confirm")
-    public ResponseEntity<?> confirmFindIdMail(@RequestBody @Valid EmailDto.ConfirmFindIdEmailRequest confirmFindIdEmailRequest) {
+    public ResponseEntity<?> confirmFindIdMail(@RequestBody @Valid ConfirmFindIdEmailRequest confirmFindIdEmailRequest) {
         String findIdConfirmAuthCode = memberService.getFindIdConfirmAuthCode(confirmFindIdEmailRequest.getReceiver());
 
         if (findIdConfirmAuthCode == null || !findIdConfirmAuthCode.equals(confirmFindIdEmailRequest.getCode())) {
@@ -197,8 +196,10 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/account/admin")
     public ResponseEntity<AccountListResponse> getAdminAccount() {
+
         List<Member> adminAccount = memberService.findAdminAccount();
         List<Account> collect = adminAccount.stream().map(Account::of).collect(Collectors.toList());
+
         return ResponseEntity.ok()
                 .body(new AccountListResponse(adminAccount.size(), collect));
     }
@@ -206,8 +207,12 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/account/all")
     public ResponseEntity<AccountListResponse> getAllAccount() {
+
         List<Member> adminAccount = memberService.findAll();
-        List<Account> collect = adminAccount.stream().map(Account::of).collect(Collectors.toList());
+        List<Account> collect = adminAccount.stream()
+                .map(Account::of)
+                .collect(Collectors.toList());
+
         return ResponseEntity.ok()
                 .body(new AccountListResponse(adminAccount.size(), collect));
     }
@@ -218,7 +223,6 @@ public class AdminController {
         Member member = memberService.findUserById(id)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
 
-//        member.setBan(!member.isBan());
         member.updateBan();
         Member savedUser = memberService.editUser(member);
         return ResponseEntity.ok()
@@ -227,12 +231,10 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/notice/search")
-    public ResponseEntity<?> searchNotice(
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Optional<LocalDateTime> startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Optional<LocalDateTime> endDate,
-            @RequestParam(required = false) Optional<String> title,
-            @RequestParam int page
-    ) {
+    public ResponseEntity<?> searchNotice(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Optional<LocalDateTime> startDate,
+                                          @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Optional<LocalDateTime> endDate,
+                                          @RequestParam(required = false) Optional<String> title,
+                                          @RequestParam int page) {
 
         List<NoticeResponse> noticeResponseList;
         int totalPage;
@@ -273,6 +275,7 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/notice")
     public ResponseEntity<?> getPageNotice(@RequestParam("page") int page) {
+
         Page<Notice> all = noticeService.findAll(page, 9);
         List<NoticeResponse> result = all.getContent()
                 .stream()
@@ -286,6 +289,7 @@ public class AdminController {
     @GetMapping("/notice/my")
     public ResponseEntity<?> getPageMyNotice(@RequestParam("page") int page,
                                              @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+
         Page<Notice> all = noticeService.findAllByMember(page, 9, memberPrincipal.getMember().getId());
         List<NoticeResponse> collect = all.getContent()
                 .stream()
@@ -308,9 +312,8 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @PostMapping("/notice")
-    public ResponseEntity<CreateNoticeResponse> uploadNotice(
-            @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-            @RequestBody @Valid CreateNoticeRequest createNoticeRequest) {
+    public ResponseEntity<CreateNoticeResponse> uploadNotice(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
+                                                             @RequestBody @Valid CreateNoticeRequest createNoticeRequest) {
 
         Notice savedNotice = noticeService.save(Notice.builder()
                 .title(createNoticeRequest.getTitle())
@@ -327,9 +330,9 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @PatchMapping("/notice/{id}")
-    public ResponseEntity<?> modifyNotice(
-            @RequestBody @Valid ModifyNoticeRequest modifyNoticeRequest,
-            @PathVariable Long id) {
+    public ResponseEntity<?> modifyNotice(@RequestBody @Valid ModifyNoticeRequest modifyNoticeRequest,
+                                          @PathVariable Long id) {
+
         Notice notice = noticeService.findById(id);
 
         Notice savedNotice = noticeService.save(Notice.builder()
@@ -361,9 +364,6 @@ public class AdminController {
     public ResponseEntity<?> getArticleCategory() {
 
         List<ArticleType> all = articleTypeService.findAll();
-//        List<ArticleTypeResponse> result = all.stream()
-//                .map(ArticleTypeResponse::of)
-//                .collect(Collectors.toList());
 
         return ResponseEntity.ok()
                 .body(all);
@@ -411,9 +411,8 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PatchMapping("/article/category/{id}")
-    public ResponseEntity<?> modifyArticleCategory(
-            @PathVariable Long id,
-            @RequestBody @Valid ArticleTypeRequest articleTypeRequest) {
+    public ResponseEntity<?> modifyArticleCategory(@PathVariable Long id,
+                                                   @RequestBody @Valid ArticleTypeRequest articleTypeRequest) {
 
         ArticleType articleType = articleTypeService.findOneById(id);
 
@@ -445,13 +444,11 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @GetMapping("/article/search")
-    public ResponseEntity<?> searchArticles(
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime endDate,
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String typeName,
-            @RequestParam int page
-    ) {
+    public ResponseEntity<?> searchArticles(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime startDate,
+                                            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime endDate,
+                                            @RequestParam(required = false) String title,
+                                            @RequestParam(required = false) String typeName,
+                                            @RequestParam int page) {
         Page<Article> articlesByConditionWithPaging = articleService.findArticlesByConditionWithPaging(page, 9, typeName, startDate, endDate, title);
         List<ArticleResponse> articleResponseList = articlesByConditionWithPaging.getContent()
                 .stream()
@@ -464,9 +461,8 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PostMapping("/article")
-    public ResponseEntity<?> uploadArticle(
-            @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-            @RequestBody @Valid CreateArticleRequest createArticleRequest) {
+    public ResponseEntity<?> uploadArticle(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
+                                           @RequestBody @Valid CreateArticleRequest createArticleRequest) {
 
         ArticleType articleType = articleTypeService.findByTypeName(createArticleRequest.getArticleTypeName())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리 입니다."));
@@ -512,9 +508,8 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @GetMapping("/article/my")
-    public ResponseEntity<?> getMemberArticle(
-            @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-            @RequestParam int page) {
+    public ResponseEntity<?> getMemberArticle(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
+                                              @RequestParam int page) {
 
         Member member = memberService.findUserById(memberPrincipal.getMember().getId())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "인증되지 않은 유저 입니다."));
@@ -531,10 +526,9 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @PatchMapping("/article/{id}")
-    public ResponseEntity<?> modifyArticle(
-            @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-            @RequestBody @Valid ModifyArticleRequest modifyArticleRequest,
-            @PathVariable Long id) {
+    public ResponseEntity<?> modifyArticle(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
+                                           @RequestBody @Valid ModifyArticleRequest modifyArticleRequest,
+                                           @PathVariable Long id) {
 
         Member member = memberService.findUserById(memberPrincipal.getMember().getId())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "인증되지 않은 유저 입니다."));
@@ -566,9 +560,8 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @DeleteMapping("/article/{id}")
-    public ResponseEntity<?> deleteArticle(
-            @AuthenticationPrincipal MemberPrincipal memberPrincipal,
-            @PathVariable Long id) {
+    public ResponseEntity<?> deleteArticle(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
+                                           @PathVariable Long id) {
 
         Member member = memberService.findUserById(memberPrincipal.getMember().getId())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "인증되지 않은 유저 입니다."));
@@ -589,8 +582,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/building")
-    public ResponseEntity<?> uploadBuildingInfo(
-            @RequestBody @Valid BuildingRequest buildingRequest) {
+    public ResponseEntity<?> uploadBuildingInfo(@RequestBody @Valid BuildingRequest buildingRequest) {
 
         Building save = buildingInfoService.save(Building.builder()
                 .name(buildingRequest.getName())
@@ -607,9 +599,8 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @PatchMapping("/building/{id}")
-    public ResponseEntity<?> modifyBuildingInfo(
-            @PathVariable("id") Long id,
-            @RequestBody @Valid BuildingRequest buildingRequest) {
+    public ResponseEntity<?> modifyBuildingInfo(@PathVariable("id") Long id,
+                                                @RequestBody @Valid BuildingRequest buildingRequest) {
 
         Building save = buildingInfoService.save(Building.builder()
                 .id(id)
@@ -627,8 +618,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/building/{id}")
-    public ResponseEntity<?> deleteBuildingInfo(
-            @PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteBuildingInfo(@PathVariable("id") Long id) {
 
         Long deleteById = buildingInfoService.deleteById(id);
 
@@ -638,9 +628,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/building")
-    public ResponseEntity<?> getPageBuildingInfo(
-            @RequestParam int page
-    ) {
+    public ResponseEntity<?> getPageBuildingInfo(@RequestParam int page) {
 
         Page<Building> pageAll = buildingInfoService.findPageAll(page, 10);
         List<BuildingResponseDto> result = pageAll.getContent()
@@ -654,9 +642,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/building/{id}")
-    public ResponseEntity<?> getPageBuildingInfo(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<?> getPageBuildingInfo(@PathVariable Long id) {
 
         Building building = buildingInfoService.findOneById(id)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 건물입니다."));
@@ -668,8 +654,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/floor")
-    public ResponseEntity<?> getFloors(
-            @RequestParam Long buildingId) {
+    public ResponseEntity<?> getFloors(@RequestParam Long buildingId) {
 
         Building building = buildingInfoService.findOneById(buildingId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "건물 정보가 없습니다."));
@@ -686,11 +671,9 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/floor/{id}")
-    public ResponseEntity<?> uploadFloor(
-            @RequestParam(value = "image") MultipartFile image,
-            @RequestParam int floorValue,
-            @PathVariable("id") Long buildingId
-    ) throws IOException {
+    public ResponseEntity<?> uploadFloor(@RequestParam(value = "image") MultipartFile image,
+                                         @RequestParam int floorValue,
+                                         @PathVariable("id") Long buildingId) throws IOException {
 
         Building building = buildingInfoService.findOneById(buildingId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "건물 정보가 없습니다."));
@@ -715,9 +698,8 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @PatchMapping("/floor/{id}")
-    public ResponseEntity<?> modifyFloor(
-            @RequestPart("image") MultipartFile image,
-            @PathVariable("id") Long floorId
+    public ResponseEntity<?> modifyFloor(@RequestPart("image") MultipartFile image,
+                                         @PathVariable("id") Long floorId
     ) throws IOException {
 
         Floor floor = floorService.findOneById(floorId)
