@@ -1,13 +1,17 @@
 package soonmap.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import soonmap.dto.BuildingInfoDto;
+import soonmap.entity.Building;
 import soonmap.entity.Floor;
+import soonmap.exception.CustomException;
 import soonmap.service.BuildingInfoService;
 
 import javax.naming.Name;
@@ -19,6 +23,9 @@ import static soonmap.dto.BuildingInfoDto.*;
 @RestController
 @RequiredArgsConstructor
 public class BuildingInfoController {
+
+    @Value("${CLOUD_FRONT_URL}")
+    private String CLOUD_FRONT_URL;
 
     private final BuildingInfoService buildingService;
 
@@ -64,5 +71,17 @@ public class BuildingInfoController {
         }
         return ResponseEntity.ok()
                 .body(buildings);
+    }
+
+    @GetMapping("/floor")
+    public ResponseEntity<?> getFloorPlan(@RequestParam("buildingId") Long buildingId,
+                                          @RequestParam("floor") int floorValue) {
+        Building building = buildingService.findOneById(buildingId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 건물입니다."));
+
+        Floor floorByBuildingIdAndFloorValue = buildingService.findFloorByBuildingIdAndFloorValue(buildingId, floorValue);
+
+        return ResponseEntity.ok()
+                .body(CLOUD_FRONT_URL + floorByBuildingIdAndFloorValue.getDir());
     }
 }

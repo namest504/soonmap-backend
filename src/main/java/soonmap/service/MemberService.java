@@ -49,6 +49,30 @@ public class MemberService implements UserDetailsService {
         return redisTemplate.opsForValue().get("RefreshToken-ADMIN-" + memberId);
     }
 
+    public void saveFindIdConfirmAuthCode(String email,String code) {
+        redisTemplate.opsForValue().set("FindIdCode-ADMIN-" + email, code, Duration.ofMinutes(3));
+    }
+
+    public String getFindIdConfirmAuthCode(String email) {
+        return redisTemplate.opsForValue().get("FindIdCode-ADMIN-" + email);
+    }
+
+    public Boolean deleteFindIdConfirmAuthCode(String email) {
+        return redisTemplate.delete("FindIdCode-ADMIN-" + email);
+    }
+
+    public void saveFindPwConfirmAuthCode(String email,String code) {
+        redisTemplate.opsForValue().set("FindPwCode-ADMIN-" + email, code, Duration.ofMinutes(3));
+    }
+
+    public String getFindPwConfirmAuthCode(String email) {
+        return redisTemplate.opsForValue().get("FindPwCode-ADMIN-" + email);
+    }
+
+    public Boolean deleteFindPwConfirmAuthCode(String email) {
+        return redisTemplate.delete("FindPwCode-ADMIN-" + email);
+    }
+
     public void validateDuplicatedId(String id) {
         memberRepository.findMemberByUserId(id)
                 .ifPresent(p -> {
@@ -146,6 +170,10 @@ public class MemberService implements UserDetailsService {
 
     }
 
+    public Optional<Member> findUserByName(String name) {
+        return memberRepository.findMemberByUserName(name);
+    }
+
     public Optional<Member> findUserBySnsId(String sns_id) {
         return memberRepository.findBySnsId(sns_id);
     }
@@ -168,5 +196,9 @@ public class MemberService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return memberRepository.findMemberByUserEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    }
+
+    public Member save(Member member) {
+        return memberRepository.save(member);
     }
 }

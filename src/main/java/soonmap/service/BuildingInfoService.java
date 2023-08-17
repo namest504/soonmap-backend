@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import soonmap.entity.Building;
 import soonmap.entity.Floor;
 import soonmap.repository.BuildingRepository;
+import soonmap.repository.FloorQuerydslRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -19,6 +20,7 @@ import static soonmap.dto.BuildingInfoDto.*;
 @RequiredArgsConstructor
 public class BuildingInfoService {
     private final BuildingRepository buildingRepository;
+    private final FloorQuerydslRepository floorQuerydslRepository;
 
     public List<FloorResponseDto> getFloorListByBuildingId(Long Id) {
         Building building = buildingRepository.findById(Id).orElseThrow(NoSuchElementException::new);
@@ -58,5 +60,9 @@ public class BuildingInfoService {
 
     public Optional<Building> findOneById(Long buildingId) {
         return buildingRepository.findById(buildingId);
+    }
+
+    public Floor findFloorByBuildingIdAndFloorValue(Long buildingId, int floorValue) {
+        return floorQuerydslRepository.findFloorByBuildingIdAndFloorValue(buildingId, floorValue);
     }
 }

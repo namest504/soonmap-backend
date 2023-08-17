@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import soonmap.dto.ArticleDto.*;
@@ -17,6 +18,8 @@ import soonmap.dto.ArticleTypeDto.ArticleTypePageResponse;
 import soonmap.dto.ArticleTypeDto.ArticleTypeRequest;
 import soonmap.dto.ArticleTypeDto.ArticleTypeResponse;
 import soonmap.dto.BuildingInfoDto.*;
+import soonmap.dto.EmailDto;
+import soonmap.dto.EmailDto.*;
 import soonmap.dto.MemberDto.*;
 import soonmap.dto.NoticeDto.*;
 import soonmap.dto.TokenDto.RefreshTokenRequest;
@@ -51,6 +54,8 @@ public class AdminController {
     private final ArticleTypeService articleTypeService;
     private final BuildingInfoService buildingInfoService;
     private final FloorService floorService;
+    private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> adminLogin(
@@ -96,8 +101,14 @@ public class AdminController {
     @PostMapping("/register")
     public ResponseEntity<AdminResisterResponse> registerAdmin(@RequestBody @Valid AdminResisterRequest adminResisterRequest) {
 
+        if (memberService.findUserByEmail(adminResisterRequest.getEmail()).isPresent()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "중복된 이메일 입니다.");
+        }
         memberService.validateDuplicatedId(adminResisterRequest.getUserId());
 
+        if (memberService.findUserByName(adminResisterRequest.getName()).isPresent()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "중복된 닉네임 입니다.");
+        }
         Member member = memberService.addAdmin(adminResisterRequest);
         return ResponseEntity.ok()
                 .body(new AdminResisterResponse(true, member.isAdmin(), member.isManager(), member.isStaff()));
@@ -107,6 +118,80 @@ public class AdminController {
     public ResponseEntity<?> logoutAdmin(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
         Boolean result = memberService.logoutAdminRefreshToken(memberPrincipal.getMember().getId());
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/find/id")
+    public ResponseEntity<?> sendFindIdMail(@RequestBody @Valid FindIdEmailRequest findIdEmailRequest) {
+        Member member = memberService.findUserByEmail(findIdEmailRequest.getReceiver())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+
+        String authCode = generateAuthCode();
+        memberService.saveFindIdConfirmAuthCode(findIdEmailRequest.getReceiver(), authCode);
+        mailService.mailSend(findIdEmailRequest.getReceiver(), authCode);
+        return ResponseEntity.ok()
+                .body(findIdEmailRequest.getReceiver());
+    }
+
+    @PostMapping("/find/id/confirm")
+    public ResponseEntity<?> confirmFindIdMail(@RequestBody @Valid EmailDto.ConfirmFindIdEmailRequest confirmFindIdEmailRequest) {
+        String findIdConfirmAuthCode = memberService.getFindIdConfirmAuthCode(confirmFindIdEmailRequest.getReceiver());
+
+        if (findIdConfirmAuthCode == null || !findIdConfirmAuthCode.equals(confirmFindIdEmailRequest.getCode())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        }
+
+        Member member = memberService.findUserByEmail(confirmFindIdEmailRequest.getReceiver())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+
+        if (!memberService.deleteFindIdConfirmAuthCode(confirmFindIdEmailRequest.getReceiver())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        }
+
+        return ResponseEntity.ok()
+                .body(new ConfirmFindIdEmailResponse(member.getUserId()));
+    }
+
+    private String generateAuthCode() {
+        return String.valueOf((int) (Math.random() * 1000000) + 100000);
+    }
+
+    @PostMapping("/find/pw")
+    public ResponseEntity<?> sendFindPwMail(@RequestBody FindPwEmailRequest findPwEmailRequest) {
+        Member member = memberService.findUserByEmail(findPwEmailRequest.getReceiver())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+
+        if (!member.getUserId().equals(findPwEmailRequest.getId())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "존재하지 않는 계정입니다.");
+        }
+
+        String authCode = generateAuthCode();
+        memberService.saveFindPwConfirmAuthCode(findPwEmailRequest.getReceiver(), authCode);
+        mailService.mailSend(findPwEmailRequest.getReceiver(), authCode);
+
+        return ResponseEntity.ok()
+                .body(findPwEmailRequest.getReceiver());
+    }
+
+    @PostMapping("/find/pw/confirm")
+    public ResponseEntity<?> confirmFindPwMail(@RequestBody @Valid ConfirmFindPwEmailRequest confirmFindPwEmailRequest) {
+        Member member = memberService.findUserByEmail(confirmFindPwEmailRequest.getReceiver())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+
+        String findIdConfirmAuthCode = memberService.getFindPwConfirmAuthCode(confirmFindPwEmailRequest.getReceiver());
+
+        if (findIdConfirmAuthCode == null || !findIdConfirmAuthCode.equals(confirmFindPwEmailRequest.getCode())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        }
+
+        member.setUserPassword(passwordEncoder.encode(confirmFindPwEmailRequest.getPw()));
+        Member save = memberService.save(member);
+
+        if (!memberService.deleteFindIdConfirmAuthCode(confirmFindPwEmailRequest.getReceiver())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        }
+
+        return ResponseEntity.ok()
+                .body(new ConfirmFindPwEmailResponse(save.getUserId()));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})

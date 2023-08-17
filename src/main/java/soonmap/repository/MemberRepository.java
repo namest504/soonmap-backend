@@ -19,4 +19,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findAdminsByAccountType(AccountType accountType);
 
     Optional<Member> findBySnsId(String snsId);
+
+    Optional<Member> findMemberByUserName(String username);
 }
