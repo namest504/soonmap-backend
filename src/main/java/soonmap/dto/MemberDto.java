@@ -5,6 +5,7 @@ import lombok.*;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,8 @@ public class MemberDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AdminResisterRequest {
+        @Email
+        private String email;
         @NotBlank
         private String name;
         @NotBlank
@@ -94,6 +97,14 @@ public class MemberDto {
         private String userEmail;
         private AccountType accountType;
         private String snsId; // naver 사용자마다 발급받는 개인식별 코드 ex) 주민등록번호
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ModifyPassWordMemberRequest {
+        @NotBlank
+        private String pw;
     }
 }
 
