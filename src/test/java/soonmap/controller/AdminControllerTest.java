@@ -24,6 +24,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -81,6 +82,12 @@ public class AdminControllerTest {
 
     @MockBean
     FloorService floorService;
+
+    @MockBean
+    MailService mailService;
+
+    @MockBean
+    PasswordEncoder passwordEncoder;
 
 
 //    @MockBean
