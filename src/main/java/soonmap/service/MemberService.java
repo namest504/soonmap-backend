@@ -171,7 +171,7 @@ public class MemberService implements UserDetailsService {
     }
 
     public Optional<Member> findUserByName(String name) {
-        return memberRepository.findMemberByUsername(name);
+        return memberRepository.findMemberByUserName(name);
     }
 
     public Optional<Member> findUserBySnsId(String sns_id) {
