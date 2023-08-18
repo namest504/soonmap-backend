@@ -86,6 +86,7 @@ public class ArticleQuerydslRepository {
                 .where(article.member.id.eq(memberId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(article.createAt.desc())
                 .fetch();
 
         Long countArticle = queryFactory.select(article.count())
