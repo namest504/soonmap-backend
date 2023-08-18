@@ -89,7 +89,7 @@ public class MemberService implements UserDetailsService {
         return memberRepository.save(Member.builder()
                 .userName(adminResisterRequest.getName())
                 .userId(adminResisterRequest.getUserId())
-                .userEmail(null)
+                .userEmail(adminResisterRequest.getEmail())
                 .userPassword(passwordEncoder.encode(adminResisterRequest.getUserPw()))
                 .accountType(AccountType.valueOf("ADMIN"))
                 .snsId(null)
