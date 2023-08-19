@@ -1,6 +1,7 @@
 package soonmap.service;
 
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,7 @@ public class MemberService implements UserDetailsService {
         return redisTemplate.opsForValue().get("RefreshToken-ADMIN-" + memberId);
     }
 
-    public void saveFindIdConfirmAuthCode(String email,String code) {
+    public void saveFindIdConfirmAuthCode(String email, String code) {
         redisTemplate.opsForValue().set("FindIdCode-ADMIN-" + email, code, Duration.ofMinutes(3));
     }
 
@@ -61,7 +62,7 @@ public class MemberService implements UserDetailsService {
         return redisTemplate.delete("FindIdCode-ADMIN-" + email);
     }
 
-    public void saveFindPwConfirmAuthCode(String email,String code) {
+    public void saveFindPwConfirmAuthCode(String email, String code) {
         redisTemplate.opsForValue().set("FindPwCode-ADMIN-" + email, code, Duration.ofMinutes(3));
     }
 
@@ -71,6 +72,14 @@ public class MemberService implements UserDetailsService {
 
     public Boolean deleteFindPwConfirmAuthCode(String email) {
         return redisTemplate.delete("FindPwCode-ADMIN-" + email);
+    }
+
+    public void saveJoinConfirmAuthCode(String email, String code) {
+        redisTemplate.opsForValue().set("JoinCode-User-" + email, code, Duration.ofMinutes(10));
+    }
+
+    public String findJoinConfirmAuthCode(String email) {
+        return redisTemplate.opsForValue().get("JoinCode-User-" + email);
     }
 
     public void validateDuplicatedId(String id) {
@@ -170,6 +179,10 @@ public class MemberService implements UserDetailsService {
 
     }
 
+    public Optional<Member> findUserByUserId(String uid) {
+        return memberRepository.findMemberByUserId(uid);
+    }
+
     public Optional<Member> findUserByName(String name) {
         return memberRepository.findMemberByUserName(name);
     }
@@ -200,5 +213,21 @@ public class MemberService implements UserDetailsService {
 
     public Member save(Member member) {
         return memberRepository.save(member);
+    }
+
+    public Member saveUser(Claims registerInfo, MemberJoinRequest memberJoinRequest) {
+        return memberRepository.save(Member.builder()
+                .userName(memberJoinRequest.getId())
+                .userId(memberJoinRequest.getId())
+                .userEmail(registerInfo.get("email", String.class))
+                .userPassword(passwordEncoder.encode(memberJoinRequest.getPw()))
+                .accountType(AccountType.BASIC)
+                .snsId(null)
+                .isBan(false)
+                .isAdmin(false)
+                .isManager(false)
+                .isStaff(false)
+                .userCreateAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .build());
     }
 }

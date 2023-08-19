@@ -1,7 +1,7 @@
 package soonmap.entity;
 
 public enum AccountType {
-    NAVER("NAVER"), KAKAO("KAKAO"), ADMIN("ADMIN");
+    NAVER("NAVER"), KAKAO("KAKAO"), ADMIN("ADMIN"), BASIC("BASIC");
 
     private String value;
 
