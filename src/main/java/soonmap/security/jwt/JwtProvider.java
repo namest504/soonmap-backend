@@ -93,4 +93,17 @@ public class JwtProvider {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 접근입니다.");
         }
     }
+
+    public String createAuthConfirmToken(String email) {
+        Claims claims = Jwts.claims().setSubject("register_token");
+        claims.put("email", email);
+        Date currentTime = new Date();
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(currentTime)
+                .setExpiration(new Date(currentTime.getTime() + 1000 * 60 * 3))
+                .signWith(SignatureAlgorithm.HS256, Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
+                .compact();
+    }
 }
