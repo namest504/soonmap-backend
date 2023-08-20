@@ -11,11 +11,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import soonmap.dto.MemberDto;
-import soonmap.dto.MemberDto.AdminLoginRequest;
+import soonmap.dto.MemberDto.LoginRequest;
 import soonmap.dto.MemberDto.AdminResisterRequest;
 
-import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.exception.CustomException;
@@ -40,6 +38,10 @@ public class MemberService implements UserDetailsService {
 
     public void saveAdminRefreshToken(Long memberId, String refreshToken) {
         redisTemplate.opsForValue().set("RefreshToken-ADMIN-" + memberId, refreshToken, Duration.ofDays(7));
+    }
+
+    public void saveUserRefreshToken(Long memberId, String refreshToken) {
+        redisTemplate.opsForValue().set("RefreshToken-User-" + memberId, refreshToken, Duration.ofDays(7));
     }
 
     public Boolean logoutAdminRefreshToken(Long memberId) {
@@ -110,15 +112,15 @@ public class MemberService implements UserDetailsService {
                 .build());
     }
 
-    public Member loginAdmin(AdminLoginRequest adminLoginRequest) {
-        Member member = memberRepository.findMemberByUserId(adminLoginRequest.getUserId())
+    public Member loginAdmin(LoginRequest loginRequest) {
+        Member member = memberRepository.findMemberByUserId(loginRequest.getUserId())
                 .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다."));
 
         if (member.isBan()) {
             throw new CustomException(HttpStatus.FORBIDDEN, "접근이 제한되었습니다.");
         }
 
-        if (!passwordEncoder.matches(adminLoginRequest.getUserPw(), member.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getUserPw(), member.getPassword())) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다.");
         }
 
@@ -221,7 +223,7 @@ public class MemberService implements UserDetailsService {
                 .userId(memberJoinRequest.getId())
                 .userEmail(registerInfo.get("email", String.class))
                 .userPassword(passwordEncoder.encode(memberJoinRequest.getPw()))
-                .accountType(AccountType.BASIC)
+                .accountType(AccountType.valueOf("BASIC"))
                 .snsId(null)
                 .isBan(false)
                 .isAdmin(false)
@@ -229,5 +231,28 @@ public class MemberService implements UserDetailsService {
                 .isStaff(false)
                 .userCreateAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build());
+    }
+
+    public Member loginUser(LoginRequest loginRequest) {
+        Member member = memberRepository.findMemberByUserId(loginRequest.getUserId())
+                .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다."));
+
+        if (member.isBan()) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "접근이 제한되었습니다.");
+        }
+
+        if (!passwordEncoder.matches(loginRequest.getUserPw(), member.getPassword())) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다.");
+        }
+
+        if (!member.isAdmin() && !member.isManager() && !member.isStaff()) {
+            return member;
+        } else {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 접근입니다.");
+        }
+    }
+
+    public Boolean matchPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }

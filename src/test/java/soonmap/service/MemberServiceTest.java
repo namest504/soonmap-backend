@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import soonmap.dto.MemberDto.AdminLoginRequest;
+import soonmap.dto.MemberDto.LoginRequest;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.exception.CustomException;
@@ -75,7 +75,7 @@ class MemberServiceTest {
     @Test
     public void adminLogin_Success() {
         testMember = new Member(1L, "testid1","test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true,true, "testSnsId", LocalDateTime.now());
-        AdminLoginRequest request = new AdminLoginRequest(testMember.getUserEmail(), "test_password");
+        LoginRequest request = new LoginRequest(testMember.getUserEmail(), "test_password");
 
         when(memberRepository.findMemberByUserId(request.getUserId())).thenReturn(Optional.of(testMember));
         when(passwordEncoder.matches(any(),any())).thenReturn(true);
@@ -90,7 +90,7 @@ class MemberServiceTest {
     @Test
     public void adminLogin_ForbiddenUserInfo() {
         testMember = new Member(1L, "testid1","forbidden@email.com", "test", "testPassword", AccountType.ADMIN, true, true, true,true, "testSnsId", LocalDateTime.now());
-        AdminLoginRequest request = new AdminLoginRequest("forbidden@email.com", "test_password");
+        LoginRequest request = new LoginRequest("forbidden@email.com", "test_password");
 
         when(memberRepository.findMemberByUserId(request.getUserId())).thenReturn(Optional.of(testMember));
 
@@ -101,7 +101,7 @@ class MemberServiceTest {
 
     @Test
     public void adminLogin_InvalidUserInfo() {
-        AdminLoginRequest request = new AdminLoginRequest("invalid@email.com", "test_password");
+        LoginRequest request = new LoginRequest("invalid@email.com", "test_password");
 
         when(memberRepository.findMemberByUserId(request.getUserId())).thenReturn(Optional.empty());
 
@@ -113,7 +113,7 @@ class MemberServiceTest {
     @Test
     public void adminLogin_WrongPassword() {
         testMember = new Member(1L, "testid1","test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true,true, "testSnsId", LocalDateTime.now());
-        AdminLoginRequest request = new AdminLoginRequest(testMember.getUserEmail(), "wrong_password");
+        LoginRequest request = new LoginRequest(testMember.getUserEmail(), "wrong_password");
 
 //        when(memberRepository.findMemberByUserEmail(testMember.getUserEmail())).thenReturn(Optional.of(testMember));
 //        when(memberRepository.findMemberById(testMember.getId())).thenReturn(Optional.of(testMember));
@@ -127,7 +127,7 @@ class MemberServiceTest {
     @Test
     public void adminLogin_InvalidUserType() {
         Member invalidMember = new Member(1L,"testid1", "test@email.com", "test", "testPassword", AccountType.ADMIN, false, false, false,false, "testSnsId", LocalDateTime.now());
-        AdminLoginRequest request = new AdminLoginRequest(invalidMember.getUserEmail(), "test_password");
+        LoginRequest request = new LoginRequest(invalidMember.getUserEmail(), "test_password");
 
         when(memberRepository.findMemberByUserId(request.getUserId())).thenReturn(Optional.of(invalidMember));
         when(passwordEncoder.matches(request.getUserPw(), invalidMember.getPassword())).thenReturn(true);
