@@ -2,6 +2,7 @@ package soonmap.controller;
 
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -14,13 +15,17 @@ import org.springframework.web.client.HttpClientErrorException;
 import soonmap.dto.SocialUserInfoDto;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
+import soonmap.exception.CustomException;
 import soonmap.security.jwt.JwtProvider;
 
 import soonmap.security.oauth.KakaoLoginBO;
 import soonmap.security.oauth.NaverLoginBO;
+import soonmap.service.MailService;
 import soonmap.service.MemberService;
 
+import javax.validation.Valid;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Optional;
 
 import static soonmap.dto.MemberDto.*;
@@ -37,6 +42,7 @@ public class MemberController {
     private final JwtProvider jwtProvider;
     private final NaverLoginBO naverLoginBO;
     private final KakaoLoginBO kakaoLoginBO;
+    private final MailService mailService;
 
 
     private String apiResult = null;
@@ -132,4 +138,50 @@ public class MemberController {
         }
     }
 
+    @PostMapping("/join/check")
+    public ResponseEntity<Void> sendEmailWithAuthCode(@RequestBody @Valid MemberEmailRequest memberEmailRequest) {
+        if (memberService.findUserByEmail(memberEmailRequest.getEmailId()).isPresent()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 입니다.");
+        }
+        if (!memberEmailRequest.getEmailId().matches("^[a-z0-9]+$")) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "입력된 형식이 올바르지 않습니다.");
+        }
+        String userEmailWithSCH = memberEmailRequest.getEmailId() + "@sch.ac.kr";
+        String generatedAuthCode = generateAuthCode();
+        mailService.mailSend(userEmailWithSCH, generatedAuthCode);
+        memberService.saveJoinConfirmAuthCode(userEmailWithSCH, generatedAuthCode);
+        return ResponseEntity.ok()
+                .build();
+    }
+    private String generateAuthCode() {
+        return String.valueOf((int) (Math.random() * 1000000) + 100000);
+    }
+
+    @PostMapping("/join/check/confirm")
+    public ResponseEntity<MemberEmailConfirmResponse> confirmEmailWithAuthCode(@RequestBody @Valid MemberEmailConfirmRequest memberEmailConfirmRequest) {
+        String joinConfirmAuthCode = memberService.findJoinConfirmAuthCode(memberEmailConfirmRequest.getEmailId());
+        if (!memberEmailConfirmRequest.getAuthCode().equals(joinConfirmAuthCode)) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "올바르지 않은 인증 코드입니다.");
+        }
+        String authConfirmToken = jwtProvider.createAuthConfirmToken(memberEmailConfirmRequest.getEmailId());
+
+        return ResponseEntity.ok()
+                .body(new MemberEmailConfirmResponse(authConfirmToken));
+    }
+
+
+    @PostMapping("/join")
+    public ResponseEntity<Void> joinMember(@RequestBody @Valid MemberJoinRequest memberJoinRequest) {
+        if (memberService.findUserByEmail(memberJoinRequest.getEmail()).isPresent()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 입니다.");
+        }
+        if (memberService.findUserByUserId(memberJoinRequest.getId()).isPresent()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "이미 가입된 아이디 입니다.");
+        }
+        Claims claims = jwtProvider.decodeJwtToken(memberJoinRequest.getRegisterToken());
+        Member member = memberService.saveUser(claims, memberJoinRequest);
+
+        return ResponseEntity.ok()
+                .build();
+    }
 }
