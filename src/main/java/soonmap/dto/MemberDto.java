@@ -7,6 +7,7 @@ import soonmap.entity.Member;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -53,9 +54,19 @@ public class MemberDto {
 
     @Getter
     @Setter
+    @AllArgsConstructor
+    public static class LoginResponse {
+        private boolean success;
+        private String name;
+        private String accessToken;
+        private String refreshToken;
+    }
+
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class AdminLoginRequest {
+    public static class LoginRequest {
         @NotBlank
         private String userId;
         @NotBlank
@@ -106,5 +117,45 @@ public class MemberDto {
         @NotBlank
         private String pw;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberEmailRequest {
+        @NotBlank
+        private String emailId;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberEmailConfirmRequest {
+        @NotNull
+        private String authCode;
+        @NotBlank
+        private String emailId;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberEmailConfirmResponse {
+        private String registerToken;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberJoinRequest {
+        @NotNull
+        private String registerToken;
+        @Email
+        private String email;
+        @NotBlank
+        private String id;
+        @NotBlank
+        private String pw;
+    }
+
 }
 

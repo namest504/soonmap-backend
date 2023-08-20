@@ -1,6 +1,7 @@
 package soonmap.service;
 
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -10,11 +11,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import soonmap.dto.MemberDto;
-import soonmap.dto.MemberDto.AdminLoginRequest;
+import soonmap.dto.MemberDto.LoginRequest;
 import soonmap.dto.MemberDto.AdminResisterRequest;
 
-import soonmap.dto.TokenDto;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.exception.CustomException;
@@ -41,6 +40,10 @@ public class MemberService implements UserDetailsService {
         redisTemplate.opsForValue().set("RefreshToken-ADMIN-" + memberId, refreshToken, Duration.ofDays(7));
     }
 
+    public void saveUserRefreshToken(Long memberId, String refreshToken) {
+        redisTemplate.opsForValue().set("RefreshToken-User-" + memberId, refreshToken, Duration.ofDays(7));
+    }
+
     public Boolean logoutAdminRefreshToken(Long memberId) {
         return redisTemplate.delete("RefreshToken-ADMIN-" + memberId);
     }
@@ -49,7 +52,7 @@ public class MemberService implements UserDetailsService {
         return redisTemplate.opsForValue().get("RefreshToken-ADMIN-" + memberId);
     }
 
-    public void saveFindIdConfirmAuthCode(String email,String code) {
+    public void saveFindIdConfirmAuthCode(String email, String code) {
         redisTemplate.opsForValue().set("FindIdCode-ADMIN-" + email, code, Duration.ofMinutes(3));
     }
 
@@ -61,7 +64,7 @@ public class MemberService implements UserDetailsService {
         return redisTemplate.delete("FindIdCode-ADMIN-" + email);
     }
 
-    public void saveFindPwConfirmAuthCode(String email,String code) {
+    public void saveFindPwConfirmAuthCode(String email, String code) {
         redisTemplate.opsForValue().set("FindPwCode-ADMIN-" + email, code, Duration.ofMinutes(3));
     }
 
@@ -71,6 +74,14 @@ public class MemberService implements UserDetailsService {
 
     public Boolean deleteFindPwConfirmAuthCode(String email) {
         return redisTemplate.delete("FindPwCode-ADMIN-" + email);
+    }
+
+    public void saveJoinConfirmAuthCode(String email, String code) {
+        redisTemplate.opsForValue().set("JoinCode-User-" + email, code, Duration.ofMinutes(10));
+    }
+
+    public String findJoinConfirmAuthCode(String email) {
+        return redisTemplate.opsForValue().get("JoinCode-User-" + email);
     }
 
     public void validateDuplicatedId(String id) {
@@ -101,15 +112,15 @@ public class MemberService implements UserDetailsService {
                 .build());
     }
 
-    public Member loginAdmin(AdminLoginRequest adminLoginRequest) {
-        Member member = memberRepository.findMemberByUserId(adminLoginRequest.getUserId())
+    public Member loginAdmin(LoginRequest loginRequest) {
+        Member member = memberRepository.findMemberByUserId(loginRequest.getUserId())
                 .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다."));
 
         if (member.isBan()) {
             throw new CustomException(HttpStatus.FORBIDDEN, "접근이 제한되었습니다.");
         }
 
-        if (!passwordEncoder.matches(adminLoginRequest.getUserPw(), member.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getUserPw(), member.getPassword())) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다.");
         }
 
@@ -170,6 +181,10 @@ public class MemberService implements UserDetailsService {
 
     }
 
+    public Optional<Member> findUserByUserId(String uid) {
+        return memberRepository.findMemberByUserId(uid);
+    }
+
     public Optional<Member> findUserByName(String name) {
         return memberRepository.findMemberByUserName(name);
     }
@@ -200,5 +215,44 @@ public class MemberService implements UserDetailsService {
 
     public Member save(Member member) {
         return memberRepository.save(member);
+    }
+
+    public Member saveUser(Claims registerInfo, MemberJoinRequest memberJoinRequest) {
+        return memberRepository.save(Member.builder()
+                .userName(memberJoinRequest.getId())
+                .userId(memberJoinRequest.getId())
+                .userEmail(registerInfo.get("email", String.class))
+                .userPassword(passwordEncoder.encode(memberJoinRequest.getPw()))
+                .accountType(AccountType.valueOf("BASIC"))
+                .snsId(null)
+                .isBan(false)
+                .isAdmin(false)
+                .isManager(false)
+                .isStaff(false)
+                .userCreateAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                .build());
+    }
+
+    public Member loginUser(LoginRequest loginRequest) {
+        Member member = memberRepository.findMemberByUserId(loginRequest.getUserId())
+                .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다."));
+
+        if (member.isBan()) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "접근이 제한되었습니다.");
+        }
+
+        if (!passwordEncoder.matches(loginRequest.getUserPw(), member.getPassword())) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "존재하지 않는 계정입니다.");
+        }
+
+        if (!member.isAdmin() && !member.isManager() && !member.isStaff()) {
+            return member;
+        } else {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 접근입니다.");
+        }
+    }
+
+    public Boolean matchPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }

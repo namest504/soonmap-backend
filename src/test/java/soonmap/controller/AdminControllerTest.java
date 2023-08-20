@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,8 +28,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import soonmap.config.SecurityConfig;
-import soonmap.dto.MemberDto.AdminLoginRequest;
-import soonmap.dto.TokenDto;
+import soonmap.dto.MemberDto.LoginRequest;
 import soonmap.dto.TokenDto.RefreshTokenRequest;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
@@ -93,14 +90,14 @@ public class AdminControllerTest {
 //    @MockBean
 //    MemberPrincipal memberPrincipal;
 
-    private AdminLoginRequest adminLoginRequest;
+    private LoginRequest loginRequest;
     private RefreshTokenRequest refreshTokenRequest;
     private Member member;
     private Claims claims;
 
     @BeforeEach
     public void setUp() {
-        adminLoginRequest = new AdminLoginRequest("test@email.com", "testPassword");
+        loginRequest = new LoginRequest("test@email.com", "testPassword");
         member = new Member(1L, "testid1", "test@email.com", "test", "testPassword", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
         claims = Jwts.claims();
     }
@@ -148,7 +145,7 @@ public class AdminControllerTest {
         ResultActions resultActions = mockMvc.perform(post("/admin/login")
                 .contentType("application/json")
                 .with(csrf())
-                .content(objectMapper.writeValueAsString(adminLoginRequest)));
+                .content(objectMapper.writeValueAsString(loginRequest)));
 
         // then
         resultActions
@@ -177,7 +174,7 @@ public class AdminControllerTest {
         ResultActions resultActions = mockMvc.perform(post("/admin/login")
                 .contentType("application/json")
                 .with(csrf())
-                .content(objectMapper.writeValueAsString(adminLoginRequest)));
+                .content(objectMapper.writeValueAsString(loginRequest)));
 
         // then
         resultActions

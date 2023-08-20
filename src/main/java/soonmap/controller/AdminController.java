@@ -18,8 +18,8 @@ import soonmap.dto.ArticleTypeDto.ArticleTypePageResponse;
 import soonmap.dto.ArticleTypeDto.ArticleTypeRequest;
 import soonmap.dto.ArticleTypeDto.ArticleTypeResponse;
 import soonmap.dto.BuildingInfoDto.*;
-import soonmap.dto.EmailDto;
 import soonmap.dto.EmailDto.*;
+import soonmap.dto.MemberDto;
 import soonmap.dto.MemberDto.*;
 import soonmap.dto.NoticeDto.*;
 import soonmap.dto.TokenDto.RefreshTokenRequest;
@@ -58,8 +58,8 @@ public class AdminController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<AdminLoginResponse> adminLogin(@RequestBody @Valid AdminLoginRequest adminLoginRequest) {
-        Member member = memberService.loginAdmin(adminLoginRequest);
+    public ResponseEntity<AdminLoginResponse> adminLogin(@RequestBody @Valid MemberDto.LoginRequest loginRequest) {
+        Member member = memberService.loginAdmin(loginRequest);
         String accessToken = jwtProvider.createAccessToken(member.getId());
         String refreshToken = jwtProvider.createRefreshToken(member.getId());
 
