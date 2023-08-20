@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import soonmap.dto.MemberDto.LoginRequest;
 import soonmap.dto.SocialUserInfoDto;
+import soonmap.dto.TokenDto.RefreshTokenRequest;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.exception.CustomException;
@@ -25,7 +27,6 @@ import soonmap.service.MemberService;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Optional;
 
 import static soonmap.dto.MemberDto.*;
@@ -183,5 +184,42 @@ public class MemberController {
 
         return ResponseEntity.ok()
                 .build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> UserLogin(@RequestBody @Valid LoginRequest loginRequest) {
+        Member member = memberService.loginUser(loginRequest);
+
+        String accessToken = jwtProvider.createAccessToken(member.getId());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId());
+
+        memberService.saveUserRefreshToken(member.getId(), refreshToken);
+        return ResponseEntity.ok()
+//                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .body(new LoginResponse(true, member.getUsername(), accessToken, refreshToken));
+    }
+
+    @PostMapping("/refresh")
+//    public ResponseEntity<?> refreshAdminToken(@CookieValue("refreshToken") String token) {
+    public ResponseEntity<?> refreshUserToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        Claims claims = jwtProvider.decodeJwtToken(refreshTokenRequest.getRefreshToken());
+
+        if (!claims.getSubject().equals("refresh_token")) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 요청입니다.");
+        }
+
+        Long uid = claims.get("uid", Long.class);
+        Member member = memberService.findUserById(uid)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
+        ;
+
+        if (memberService.getAdminRefreshToken(member.getId()) == null) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 요청입니다.");
+        }
+
+        String accessToken = jwtProvider.createAccessToken(uid);
+        return ResponseEntity.ok()
+//                .header("accessToken", accessToken)
+                .body(accessToken);
     }
 }
