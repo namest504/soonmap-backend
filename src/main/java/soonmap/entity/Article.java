@@ -35,4 +35,8 @@ public class Article {
 
     @Column(nullable = false)
     private int view;
+
+    public void updateView() {
+        this.view += 1;
+    }
 }
