@@ -1,9 +1,12 @@
 package soonmap.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import soonmap.exception.CustomException;
 
 @Service
 @RequiredArgsConstructor
@@ -17,8 +20,11 @@ public class MailService {
         message.setTo(receiver);
         message.setSubject(createTitle());
         message.setText(createText(code));
-
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (RuntimeException e) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "메일 전송에 실패하였습니다.");
+        }
     }
 
     private String createTitle() {

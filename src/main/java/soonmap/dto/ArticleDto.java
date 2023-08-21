@@ -40,6 +40,14 @@ public class ArticleDto {
     @Getter
     @Setter
     @AllArgsConstructor
+    public static class ArticlePageResponseWithOutContent {
+        private int totalPage;
+        private List<ArticleResponseWithOutContent> articleList;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
     public static class ArticleResponseWithOutContent {
         private Long id;
         private String title;

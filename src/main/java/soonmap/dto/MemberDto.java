@@ -54,9 +54,19 @@ public class MemberDto {
 
     @Getter
     @Setter
+    @AllArgsConstructor
+    public static class LoginResponse {
+        private boolean success;
+        private String name;
+        private String accessToken;
+        private String refreshToken;
+    }
+
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class AdminLoginRequest {
+    public static class LoginRequest {
         @NotBlank
         private String userId;
         @NotBlank
