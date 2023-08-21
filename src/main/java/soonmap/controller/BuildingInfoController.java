@@ -49,7 +49,7 @@ public class BuildingInfoController {
      */
 
     @GetMapping("/building")
-    ResponseEntity<?> getBuildingorBuildingListByKeyword(@RequestParam String keyword) {
+    ResponseEntity<?> getBuildingorBuildingListByKeyword(@RequestParam(required = false) String keyword) {
         if (keyword.isEmpty()) {
             List<BuildingResponseDto> buildingResponseDtoList = buildingService.getAllBuildingList();
             if (buildingResponseDtoList.isEmpty()) {
