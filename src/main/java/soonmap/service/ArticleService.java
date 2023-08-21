@@ -3,10 +3,10 @@ package soonmap.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import soonmap.entity.Article;
-import soonmap.entity.Member;
 import soonmap.repository.ArticleQuerydslRepository;
 import soonmap.repository.ArticleRepository;
 
@@ -51,6 +51,10 @@ public class ArticleService {
     public Page<Article> findArticlesByConditionWithPaging(int page, int length ,String typeName, LocalDateTime startDate, LocalDateTime endDate, String title) {
         PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
         return articleQuerydslRepository.findArticlesByCondition(typeName,startDate,endDate,title,pageRequest);
+    }
+
+    public Page<Article> findArticlesByConditionWithPaging(Pageable pageable, String typeName, LocalDateTime startDate, LocalDateTime endDate, String title) {
+        return articleQuerydslRepository.findArticlesByCondition(typeName,startDate,endDate,title, pageable);
     }
 
     public List<Article> findMainArticles() {
