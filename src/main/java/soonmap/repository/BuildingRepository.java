@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface BuildingRepository extends JpaRepository<Building, Long> {
-    List<Building> findBuildingsByName(String name);
+    Optional<Building> findBuildingByName(String name);
     Optional<Building> findByUniqueNumber(String uniqueNumber);
     Page<Building> findAll(Pageable pageable);
 }

@@ -136,33 +136,14 @@ public class BuildingInfoServiceTest {
         building2.setUniqueNumber("9");
         buildings.add(building2);
 
-        when(buildingRepository.findBuildingsByName(buildingName)).thenReturn(buildings);
+        when(buildingRepository.findBuildingByName(buildingName)).thenReturn(Optional.of(building1));
 
         // When
-        List<BuildingResponseDto> buildingList = buildingInfoService.getBuildingByName(buildingName);
+        BuildingResponseDto buildingResponseDto = buildingInfoService.getBuildingByName(buildingName);
 
         // Then
-        assertEquals(2, buildingList.size());
-        assertEquals(building1.getName(), buildingList.get(0).getName());
-        assertEquals(building1.getFloors(), buildingList.get(0).getFloors());
-        assertEquals(building2.getName(), buildingList.get(1).getName());
-        assertEquals(building2.getFloors(), buildingList.get(1).getFloors());
-        assertEquals(building1.getLongitude(), buildingList.get(0).getLongitude());
-        assertEquals(building1.getLatitude(), buildingList.get(0).getLatitude());
-        assertEquals(building1.getUniqueNumber(), buildingList.get(0).getUniqueNumber());
-        assertEquals(building2.getLongitude(), buildingList.get(1).getLongitude());
-        assertEquals(building2.getLatitude(), buildingList.get(1).getLatitude());
-        assertEquals(building2.getUniqueNumber(), buildingList.get(1).getUniqueNumber());
+        assertEquals(buildingResponseDto.getName(), buildings.get(0).getName());
+        assertEquals(buildingResponseDto.getUniqueNumber(), buildings.get(0).getUniqueNumber());
+        assertEquals(buildingResponseDto.getFloors(), building1.getFloors());
     }
-//    @Test
-//    public void testGetAllBuildingListReturnsJson() throws JsonProcessingException {
-//        List<BuildingResponseDto> buildingResponseDtoList = new ArrayList<>();
-//        BuildingResponseDto building1 = new BuildingResponseDto("의료과학관", 6, "의료대 입니다.");
-//        BuildingResponseDto building2 = new BuildingResponseDto("인문과학관", 6, "인문대 입니다.");
-//        buildingResponseDtoList.add(building1);
-//        buildingResponseDtoList.add(building2);
-//
-//        String jsonResponse = objectMapper.writeValueAsString(buildingResponseDtoList);
-//        assertEquals(buildingResponseDtoList,jsonResponse);
-//    }
 }
