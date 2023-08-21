@@ -45,32 +45,21 @@ public class BuildingInfoController {
     }
 
     /*
-     건물의 전체 리스트를 반환하는 api입니다.
+    keyword가 빈칸일 때는 전체 건물 리스트를 반환하고, 키워드가 있을 때는 검색 기능을 이용해서 Building 객체를 반환하는 api입니다.
      */
-    @GetMapping("/building/list")
-    ResponseEntity<?> getAllBuildingList() {
-        try {
-            List<BuildingResponseDto> buildings = buildingService.getAllBuildingList();
-            return ResponseEntity.ok()
-                    .body(buildings);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("현재 DB에 저장되어 있는 빌딩이 없습니다.");
-        }
-    }
 
-    /*
-     건물을 이름으로 검색했을때 키워드에 해당되는 건물 리스트 반환하는 api입니다.
-     */
-    @GetMapping("/building/info/{name}")
-    ResponseEntity<?> getBuildingByName(@PathVariable String name) {
-        List<BuildingResponseDto> buildings = buildingService.getBuildingByName(name);
-        if (buildings.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("해당 이름을 가진 Building이 없습니다.");
+    @GetMapping("building")
+    ResponseEntity<?> getBuildingorBuildingListByKeyword(@RequestParam String keyword) {
+        if (keyword.isEmpty()) {
+            List<BuildingResponseDto> buildingResponseDtoList = buildingService.getAllBuildingList();
+            if (buildingResponseDtoList.isEmpty()) {
+                throw new CustomException(HttpStatus.BAD_REQUEST, "헌재 DB에 저장되어 있는 Building이 없습니다.");
+            }
+            return ResponseEntity.ok(buildingResponseDtoList);
+        } else {
+            BuildingResponseDto buildingResponseDto = buildingService.getBuildingByName(keyword);
+            return ResponseEntity.ok(buildingResponseDto);
         }
-        return ResponseEntity.ok()
-                .body(buildings);
     }
 
     @GetMapping("/floor")

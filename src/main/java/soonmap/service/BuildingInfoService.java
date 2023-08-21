@@ -3,9 +3,11 @@ package soonmap.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import soonmap.entity.Building;
 import soonmap.entity.Floor;
+import soonmap.exception.CustomException;
 import soonmap.repository.BuildingRepository;
 import soonmap.repository.FloorQuerydslRepository;
 
@@ -37,11 +39,10 @@ public class BuildingInfoService {
         return buildingResponseDtos;
     }
 
-    public List<BuildingResponseDto> getBuildingByName(String name) {
-        List<Building> buildings = buildingRepository.findBuildingsByName(name);
-
-        List<BuildingResponseDto> buildingResponseDtos = buildings.stream().map(BuildingResponseDto::new).collect(Collectors.toList());
-        return buildingResponseDtos;
+    public BuildingResponseDto getBuildingByName(String name) {
+        Building building = buildingRepository.findBuildingByName(name).orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "Building을 찾을 수 없습니다."));
+        BuildingResponseDto buildingResponseDto = new BuildingResponseDto(building);
+        return buildingResponseDto;
     }
 
     public Building save(Building building) {
