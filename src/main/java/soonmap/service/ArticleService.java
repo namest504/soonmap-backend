@@ -48,10 +48,10 @@ public class ArticleService {
         return articleRepository.findArticlesByArticleType_Id(id);
     }
 
-    public Page<Article> findArticlesByConditionWithPaging(int page, int length ,String typeName, LocalDateTime startDate, LocalDateTime endDate, String title) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        return articleQuerydslRepository.findArticlesByCondition(typeName,startDate,endDate,title,pageRequest);
-    }
+//    public Page<Article> findArticlesByConditionWithPaging(int page, int length ,String typeName, LocalDateTime startDate, LocalDateTime endDate, String title) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+//        return articleQuerydslRepository.findArticlesByCondition(typeName,startDate,endDate,title,pageRequest);
+//    }
 
     public Page<Article> findArticlesByConditionWithPaging(Pageable pageable, String typeName, LocalDateTime startDate, LocalDateTime endDate, String title) {
         return articleQuerydslRepository.findArticlesByCondition(typeName,startDate,endDate,title, pageable);
