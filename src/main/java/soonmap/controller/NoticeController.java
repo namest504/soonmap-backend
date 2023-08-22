@@ -3,6 +3,7 @@ package soonmap.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,7 +52,7 @@ public class NoticeController {
 
     @GetMapping("/notice")
     public ResponseEntity<?> getNoticePaging(
-            @PageableDefault(size = 5, sort = "createAt") Pageable pageable,
+            @PageableDefault(size = 5, direction = Sort.Direction.DESC, sort = "createAt") Pageable pageable,
 //            @RequestParam int page,
             @RequestParam(required = false) String title
     ) {
