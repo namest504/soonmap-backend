@@ -120,4 +120,10 @@ public class BuildingInfoDto {
             return new URLAddedFloorResponse(floorResponse.getId(), floorResponse.getDescription(), link + floorResponse.getDir(), floorResponse.getFloorValue(), floorResponse.getUniqueNumber());
         }
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class TotalFloorCount {
+        private Integer count;
+    }
 }

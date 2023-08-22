@@ -32,6 +32,12 @@ public class BuildingInfoService {
         return floorDtos;
     }
 
+    public int getTotalFloorByBuilding(Long buildingId) {
+        Building building = buildingRepository.findById(buildingId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 건물입니다,"));
+        return building.getFloor_info().size();
+    }
+
     public List<BuildingResponseDto> getAllBuildingList() {
         List<Building> buildings = buildingRepository.findAll();
         List<BuildingResponseDto> buildingResponseDtos = buildings.stream().map(BuildingResponseDto::new).collect(Collectors.toList());
