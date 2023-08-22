@@ -123,7 +123,8 @@ public class BuildingInfoDto {
 
     @Getter
     @AllArgsConstructor
-    public static class TotalFloorCount {
+    public static class BuildingInfoResponse {
+        private String buildingName;
         private Integer count;
     }
 }
