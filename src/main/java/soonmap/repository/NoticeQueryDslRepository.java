@@ -67,9 +67,19 @@ public class NoticeQueryDslRepository {
                 .where(notice.isTop.isFalse(), titleContains(title))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+//                .orderBy(notice.createAt.desc())
                 .fetch();
 
-        return new PageImpl<>(noticeList, pageable, noticeList.size());
+        Long countNotice = queryFactory.select(notice.count())
+                .from(notice)
+                .where(notice.isTop.isFalse(), titleContains(title))
+                .fetchOne();
+
+        if (countNotice == null) {
+            countNotice = 0L;
+        }
+
+        return new PageImpl<>(noticeList, pageable, countNotice);
     }
 
     private BooleanExpression titleContains(String title) {
@@ -89,6 +99,10 @@ public class NoticeQueryDslRepository {
                 .from(notice)
                 .where(notice.member.id.eq(memberId))
                 .fetchOne();
+
+        if (countNotice == null) {
+            countNotice = 0L;
+        }
 
         return new PageImpl<>(noticeList, pageable, countNotice);
     }

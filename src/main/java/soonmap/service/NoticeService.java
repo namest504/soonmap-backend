@@ -3,6 +3,7 @@ package soonmap.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -66,9 +67,9 @@ public class NoticeService {
         return noticeQueryDslRepository.findMainNotice();
     }
 
-    public Page<Notice> findNormal(int page, int length, String title) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        return noticeQueryDslRepository.findNormalNotice(pageRequest, title);
+    public Page<Notice> findNormal(Pageable pageable, String title) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return noticeQueryDslRepository.findNormalNotice(pageable, title);
     }
 
     public Page<Notice> findAllByMember(int page, int length, Long memberId) {
