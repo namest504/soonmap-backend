@@ -3,7 +3,6 @@ package soonmap.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import soonmap.entity.Floor;
 import soonmap.repository.BuildingRepository;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +56,7 @@ public class BuildingInfoServiceTest {
         floor3.setId(103L);
         floor3.setDescription("3층");
         floors.add(floor3);
-        building.setFloor_info(floors);
+        building.setFloorInfo(floors);
 
         when(buildingRepository.findById(1L)).thenReturn(Optional.of(building));
 

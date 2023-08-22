@@ -26,7 +26,7 @@ public class BuildingInfoService {
 
     public List<FloorResponseDto> getFloorListByBuildingId(Long Id) {
         Building building = buildingRepository.findById(Id).orElseThrow(NoSuchElementException::new);
-        List<Floor> floors = building.getFloor_info();
+        List<Floor> floors = building.getFloorInfo();
 
         List<FloorResponseDto> floorDtos = floors.stream().map(FloorResponseDto::new).collect(Collectors.toList());
         return floorDtos;
@@ -35,7 +35,7 @@ public class BuildingInfoService {
     public int getTotalFloorByBuilding(Long buildingId) {
         Building building = buildingRepository.findById(buildingId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 건물입니다,"));
-        return building.getFloor_info().size();
+        return building.getFloorInfo().size();
     }
 
     public List<BuildingResponseDto> getAllBuildingList() {
