@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -460,8 +463,8 @@ public class AdminController {
                                             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime endDate,
                                             @RequestParam(required = false) String title,
                                             @RequestParam(required = false) String typeName,
-                                            @RequestParam int page) {
-        Page<Article> articlesByConditionWithPaging = articleService.findArticlesByConditionWithPaging(page, 9, typeName, startDate, endDate, title);
+                                            @PageableDefault(size = 9, direction = Sort.Direction.DESC, sort = "createAt") Pageable pageable) {
+        Page<Article> articlesByConditionWithPaging = articleService.findArticlesByConditionWithPaging(pageable, typeName, startDate, endDate, title);
         List<ArticleResponse> articleResponseList = articlesByConditionWithPaging.getContent()
                 .stream()
                 .map(ArticleResponse::of)
