@@ -229,6 +229,18 @@ public class AdminController {
                 .body(Account.of(savedUser));
     }
 
+    @Secured("ROLE_ADMIN")
+    @PatchMapping("/manage/manager")
+    public ResponseEntity<Account> modifyIsManagerAccount(@RequestParam Long id) {
+        Member member = memberService.findUserById(id)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
+
+        member.updateManager();
+        Member savedUser = memberService.editUser(member);
+        return ResponseEntity.ok()
+                .body(Account.of(savedUser));
+    }
+
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/notice/search")
     public ResponseEntity<?> searchNotice(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Optional<LocalDateTime> startDate,

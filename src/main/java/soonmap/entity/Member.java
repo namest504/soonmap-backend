@@ -117,4 +117,11 @@ public class Member implements UserDetails {
         this.isBan = !this.isBan;
     }
 
+    public void updateManager() {
+        this.isManager = !this.isManager;
+    }
+
+    public void updateAdmin() {
+        this.isAdmin = !this.isAdmin;
+    }
 }
