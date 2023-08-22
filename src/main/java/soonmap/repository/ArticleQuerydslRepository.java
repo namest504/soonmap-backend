@@ -94,6 +94,10 @@ public class ArticleQuerydslRepository {
                 .where(article.member.id.eq(memberId))
                 .fetchOne();
 
+        if (countArticle == null) {
+            countArticle = 0L;
+        }
+
         return new PageImpl<>(articleList, pageable, countArticle);
     }
 }
