@@ -27,6 +27,7 @@ public class BuildingInfoDto {
         private Long id;
         private String name;
         private int floors;
+        private int underground;
         private String description;
         private double latitude; // 위도
         private double longitude; // 경도
@@ -47,6 +48,7 @@ public class BuildingInfoDto {
                     building.getId(),
                     building.getName(),
                     building.getFloors(),
+                    building.getUnderground(),
                     building.getDescription(),
                     building.getLatitude(),
                     building.getLongitude(),
@@ -63,6 +65,8 @@ public class BuildingInfoDto {
         private String name;
         @NotNull
         private int floors;
+        @NotNull
+        private int underground;
         @NotBlank
         private String description;
         @NotNull
@@ -125,6 +129,12 @@ public class BuildingInfoDto {
     @AllArgsConstructor
     public static class BuildingInfoResponse {
         private String buildingName;
+        private Integer floorsUp;
+        private Integer floorsDown;
         private Integer count;
+
+        public static BuildingInfoResponse of(Building building) {
+            return new BuildingInfoResponse(building.getName(), building.getFloors(),building.getUnderground(), building.getFloorInfo().size());
+        }
     }
 }

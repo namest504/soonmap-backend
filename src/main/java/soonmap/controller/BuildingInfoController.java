@@ -1,7 +1,6 @@
 package soonmap.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.util.CustomObjectInputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +48,7 @@ public class BuildingInfoController {
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "존재하지 않은 건물입니다."));
         int totalFloorByBuilding = buildingService.getTotalFloorByBuilding(id);
         return ResponseEntity.ok()
-                .body(new BuildingInfoResponse(building.getName(), totalFloorByBuilding));
+                .body(new BuildingInfoResponse(building.getName(), building.getFloors(), building.getUnderground(),totalFloorByBuilding));
     }
 
     /*
@@ -57,7 +56,7 @@ public class BuildingInfoController {
      */
 
     @GetMapping("/building")
-    ResponseEntity<List<BuildingResponseDto>> getBuildingorBuildingListByKeyword(@RequestParam(required = false) String keyword) {
+    ResponseEntity<List<BuildingResponseDto>> getBuildingOrBuildingListByKeyword(@RequestParam(required = false) String keyword) {
         if (keyword.isEmpty()) {
             List<BuildingResponseDto> buildingResponseDtoList = buildingService.getAllBuildingList();
             if (buildingResponseDtoList.isEmpty()) {
