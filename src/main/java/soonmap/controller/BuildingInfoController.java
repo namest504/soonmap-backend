@@ -44,6 +44,13 @@ public class BuildingInfoController {
         }
     }
 
+    @GetMapping("/building/{id}/count")
+    public ResponseEntity<?> getTotalFloorByBuildingId(@PathVariable Long id) {
+        int totalFloorByBuilding = buildingService.getTotalFloorByBuilding(id);
+        return ResponseEntity.ok()
+                .body(new TotalFloorCount(totalFloorByBuilding));
+    }
+
     /*
     keyword가 빈칸일 때는 전체 건물 리스트를 반환하고, 키워드가 있을 때는 검색 기능을 이용해서 Building 객체를 반환하는 api입니다.
      */
