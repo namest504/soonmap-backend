@@ -45,10 +45,12 @@ public class BuildingInfoService {
         return buildingResponseDtos;
     }
 
-    public BuildingResponseDto getBuildingByName(String name) {
-        Building building = buildingRepository.findBuildingByName(name).orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "Building을 찾을 수 없습니다."));
-        BuildingResponseDto buildingResponseDto = new BuildingResponseDto(building);
-        return buildingResponseDto;
+    public List<BuildingResponseDto> getBuildingByName(String name) {
+        List<Building> building = buildingRepository.findBuildingByName("%"+name+"%");
+        List<BuildingResponseDto> buildingResponseDtoList = building.stream()
+                .map(BuildingResponseDto::new)
+                .collect(Collectors.toList());
+        return buildingResponseDtoList;
     }
 
     public Building save(Building building) {

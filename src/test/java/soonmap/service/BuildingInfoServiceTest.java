@@ -114,7 +114,7 @@ public class BuildingInfoServiceTest {
     }
 
     @Test
-    void GetBuildingByName() {
+    void getBuildingByNameTest() {
         // Given
         String buildingName = "미디어랩스";
         List<Building> buildings = new ArrayList<>();
@@ -136,14 +136,19 @@ public class BuildingInfoServiceTest {
         building2.setUniqueNumber("9");
         buildings.add(building2);
 
-        when(buildingRepository.findBuildingByName(buildingName)).thenReturn(Optional.of(building1));
+        when(buildingRepository.findBuildingByName("%" + buildingName + "%")).thenReturn(buildings);
 
         // When
-        BuildingResponseDto buildingResponseDto = buildingInfoService.getBuildingByName(buildingName);
+        List<BuildingResponseDto> buildingResponseDtoList = buildingInfoService.getBuildingByName(buildingName);
 
         // Then
-        assertEquals(buildingResponseDto.getName(), buildings.get(0).getName());
-        assertEquals(buildingResponseDto.getUniqueNumber(), buildings.get(0).getUniqueNumber());
-        assertEquals(buildingResponseDto.getFloors(), building1.getFloors());
+        assertEquals(buildingResponseDtoList.get(0).getName(), buildings.get(0).getName());
+        assertEquals(buildingResponseDtoList.get(0).getUniqueNumber(), buildings.get(0).getUniqueNumber());
+        assertEquals(buildingResponseDtoList.get(0).getFloors(), building1.getFloors());
+
+        assertEquals(buildingResponseDtoList.get(1).getName(), buildings.get(1).getName());
+        assertEquals(buildingResponseDtoList.get(1).getUniqueNumber(), buildings.get(1).getUniqueNumber());
+        assertEquals(buildingResponseDtoList.get(1).getFloors(), building2.getFloors());
     }
+
 }
