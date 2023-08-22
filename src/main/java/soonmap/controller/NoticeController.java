@@ -2,6 +2,9 @@ package soonmap.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,10 +52,11 @@ public class NoticeController {
 
     @GetMapping("/notice")
     public ResponseEntity<?> getNoticePaging(
-            @RequestParam int page,
+            @PageableDefault(size = 5, direction = Sort.Direction.DESC, sort = "createAt") Pageable pageable,
+//            @RequestParam int page,
             @RequestParam(required = false) String title
     ) {
-        Page<Notice> normal = noticeService.findNormal(page, 5, title);
+        Page<Notice> normal = noticeService.findNormal(pageable, title);
         List<NoticeResponse> result = normal.getContent()
                 .stream()
                 .map(NoticeResponse::of)

@@ -33,6 +33,7 @@ public class BuildingInfoDto {
         private String uniqueNumber; // 고유번호
 
         public BuildingResponseDto(Building building) {
+            this.id = building.getId();
             this.name = building.getName();
             this.floors = building.getFloors();
             this.description = building.getDescription();
@@ -42,7 +43,14 @@ public class BuildingInfoDto {
         }
 
         public static BuildingResponseDto of(Building building) {
-            return new BuildingResponseDto(building.getId(), building.getName(), building.getFloors(), building.getDescription(), building.getLatitude(), building.getLongitude(), building.getUniqueNumber());
+            return new BuildingResponseDto(
+                    building.getId(),
+                    building.getName(),
+                    building.getFloors(),
+                    building.getDescription(),
+                    building.getLatitude(),
+                    building.getLongitude(),
+                    building.getUniqueNumber());
         }
     }
 
@@ -111,5 +119,12 @@ public class BuildingInfoDto {
         public static URLAddedFloorResponse addURL(String link, FloorResponse floorResponse) {
             return new URLAddedFloorResponse(floorResponse.getId(), floorResponse.getDescription(), link + floorResponse.getDir(), floorResponse.getFloorValue(), floorResponse.getUniqueNumber());
         }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class BuildingInfoResponse {
+        private String buildingName;
+        private Integer count;
     }
 }
