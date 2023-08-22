@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import soonmap.dto.ArticleDto;
-import soonmap.dto.ArticleDto.ArticlePageResponse;
 import soonmap.dto.ArticleDto.ArticlePageResponseWithOutContent;
 import soonmap.dto.ArticleDto.ArticleResponse;
 import soonmap.dto.ArticleDto.ArticleResponseWithOutContent;
