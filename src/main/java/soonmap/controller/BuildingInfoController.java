@@ -1,6 +1,7 @@
 package soonmap.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.util.CustomObjectInputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +57,7 @@ public class BuildingInfoController {
      */
 
     @GetMapping("/building")
-    ResponseEntity<?> getBuildingorBuildingListByKeyword(@RequestParam String keyword) {
+    ResponseEntity<List<BuildingResponseDto>> getBuildingorBuildingListByKeyword(@RequestParam(required = false) String keyword) {
         if (keyword.isEmpty()) {
             List<BuildingResponseDto> buildingResponseDtoList = buildingService.getAllBuildingList();
             if (buildingResponseDtoList.isEmpty()) {
@@ -64,8 +65,11 @@ public class BuildingInfoController {
             }
             return ResponseEntity.ok(buildingResponseDtoList);
         } else {
-            BuildingResponseDto buildingResponseDto = buildingService.getBuildingByName(keyword);
-            return ResponseEntity.ok(buildingResponseDto);
+            List<BuildingResponseDto> buildingResponseDtoList = buildingService.getBuildingByName(keyword);
+            if (buildingResponseDtoList.isEmpty()) {
+                throw new CustomException(HttpStatus.NOT_FOUND, "해당 키워드에 맞는 건물이 없습니다.");
+            }
+            return ResponseEntity.ok(buildingResponseDtoList);
         }
     }
 
