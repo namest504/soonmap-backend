@@ -8,13 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import soonmap.dto.BuildingInfoDto;
 import soonmap.entity.Building;
 import soonmap.entity.Floor;
 import soonmap.exception.CustomException;
 import soonmap.service.BuildingInfoService;
 
-import javax.naming.Name;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -32,23 +30,25 @@ public class BuildingInfoController {
     /*
      건물을 클릭했을때 건물에 있는 층별 상세정보를 받아 올 수 있는 api입니다.
      */
-    @GetMapping("/building/{Id}")
-    ResponseEntity<?> getFloorByBuildingId(@PathVariable Long Id) {
-        try {
-            List<FloorResponseDto> floors = buildingService.getFloorListByBuildingId(Id);
-            return ResponseEntity.ok()
-                    .body(floors);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Building이 존재하지 않습니다.");
-        }
-    }
+//    @GetMapping("/building/{Id}")
+//    ResponseEntity<?> getFloorByBuildingId(@PathVariable Long Id) {
+//        try {
+//            List<FloorResponseDto> floors = buildingService.getFloorListByBuildingId(Id);
+//            return ResponseEntity.ok()
+//                    .body(floors);
+//        } catch (NoSuchElementException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                    .body("Building이 존재하지 않습니다.");
+//        }
+//    }
 
-    @GetMapping("/building/{id}/count")
+    @GetMapping("/building/{id}")
     public ResponseEntity<?> getTotalFloorByBuildingId(@PathVariable Long id) {
+        Building building = buildingService.findOneById(id)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "존재하지 않은 건물입니다."));
         int totalFloorByBuilding = buildingService.getTotalFloorByBuilding(id);
         return ResponseEntity.ok()
-                .body(new TotalFloorCount(totalFloorByBuilding));
+                .body(new BuildingInfoResponse(building.getName(), totalFloorByBuilding));
     }
 
     /*
