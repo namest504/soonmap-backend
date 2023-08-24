@@ -30,6 +30,7 @@ public class ArticleQuerydslRepository {
                         titleContains(title))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(article.createAt.desc())
                 .fetch();
 
         Long countArticle = queryFactory.select(article.count())
@@ -38,6 +39,10 @@ public class ArticleQuerydslRepository {
                         dateBetween(startDate, endDate),
                         titleContains(title))
                 .fetchOne();
+
+        if (countArticle == null) {
+            countArticle = 0L;
+        }
 
         return new PageImpl<>(articleList, pageable, countArticle);
     }
