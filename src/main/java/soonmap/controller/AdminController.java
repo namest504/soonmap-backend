@@ -397,7 +397,7 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @GetMapping("/article/category/page")
-    public ResponseEntity<?> getPageArticleCategory(@PageableDefault(size = 10, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<?> getPageArticleCategory(@PageableDefault(direction = Sort.Direction.DESC, sort = "id") Pageable pageable) {
 
         Page<ArticleType> articleTypePage = articleTypeService.findAll(pageable);
         int totalPages = articleTypePage.getTotalPages();
