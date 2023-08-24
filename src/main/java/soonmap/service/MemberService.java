@@ -259,4 +259,9 @@ public class MemberService implements UserDetailsService {
     public Boolean matchPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
+
+    public Boolean withdrawUser(Long uid) {
+        memberRepository.deleteById(uid);
+        return logoutUserRefreshToken(uid);
+    }
 }
