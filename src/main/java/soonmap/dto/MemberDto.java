@@ -123,7 +123,7 @@ public class MemberDto {
     @AllArgsConstructor
     public static class MemberEmailRequest {
         @NotBlank
-        private String emailId;
+        private String email;
     }
 
     @Getter
@@ -133,7 +133,7 @@ public class MemberDto {
         @NotNull
         private String authCode;
         @NotBlank
-        private String emailId;
+        private String email;
     }
 
     @Getter
