@@ -149,13 +149,13 @@ public class MemberController {
 
     @PostMapping("/join/check")
     public ResponseEntity<Void> sendEmailWithAuthCode(@RequestBody @Valid MemberEmailRequest memberEmailRequest) {
-        if (memberService.findUserByEmail(memberEmailRequest.getEmailId()).isPresent()) {
+        if (memberService.findUserByEmail(memberEmailRequest.getEmail()).isPresent()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 입니다.");
         }
         if (!memberEmailRequest.getEmailId().matches("^[a-z0-9]+$")) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "입력된 형식이 올바르지 않습니다.");
         }
-        String userEmailWithSCH = memberEmailRequest.getEmailId() + "@sch.ac.kr";
+        String userEmailWithSCH = memberEmailRequest.getEmail() + "@sch.ac.kr";
         String generatedAuthCode = generateAuthCode();
         mailService.mailSend(userEmailWithSCH, generatedAuthCode);
         memberService.saveJoinConfirmAuthCode(userEmailWithSCH, generatedAuthCode);
@@ -168,11 +168,11 @@ public class MemberController {
 
     @PostMapping("/join/check/confirm")
     public ResponseEntity<MemberEmailConfirmResponse> confirmEmailWithAuthCode(@RequestBody @Valid MemberEmailConfirmRequest memberEmailConfirmRequest) {
-        String joinConfirmAuthCode = memberService.findJoinConfirmAuthCode(memberEmailConfirmRequest.getEmailId());
+        String joinConfirmAuthCode = memberService.findJoinConfirmAuthCode(memberEmailConfirmRequest.getEmail());
         if (!memberEmailConfirmRequest.getAuthCode().equals(joinConfirmAuthCode)) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "올바르지 않은 인증 코드입니다.");
         }
-        String authConfirmToken = jwtProvider.createAuthConfirmToken(memberEmailConfirmRequest.getEmailId());
+        String authConfirmToken = jwtProvider.createAuthConfirmToken(memberEmailConfirmRequest.getEmail());
 
         return ResponseEntity.ok()
                 .body(new MemberEmailConfirmResponse(authConfirmToken));
