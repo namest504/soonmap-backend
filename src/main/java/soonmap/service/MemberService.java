@@ -48,6 +48,10 @@ public class MemberService implements UserDetailsService {
         return redisTemplate.delete("RefreshToken-ADMIN-" + memberId);
     }
 
+    public Boolean logoutUserRefreshToken(Long memberId) {
+        return redisTemplate.delete("RefreshToken-User-" + memberId);
+    }
+
     public String getAdminRefreshToken(Long memberId) {
         return redisTemplate.opsForValue().get("RefreshToken-ADMIN-" + memberId);
     }
