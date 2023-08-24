@@ -9,9 +9,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import soonmap.dto.EmailDto;
+import soonmap.dto.EmailDto.ConfirmFindIdEmailRequest;
+import soonmap.dto.EmailDto.ConfirmFindIdEmailResponse;
+import soonmap.dto.EmailDto.ConfirmFindPwEmailRequest;
+import soonmap.dto.EmailDto.ConfirmFindPwEmailResponse;
+import soonmap.dto.EmailDto.FindPwEmailRequest;
 import soonmap.dto.MemberDto.LoginRequest;
 import soonmap.dto.SocialUserInfoDto;
 import soonmap.dto.TokenDto.RefreshTokenRequest;
@@ -44,6 +51,7 @@ public class MemberController {
     private final NaverLoginBO naverLoginBO;
     private final KakaoLoginBO kakaoLoginBO;
     private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
 
 
     private String apiResult = null;
@@ -221,5 +229,74 @@ public class MemberController {
         return ResponseEntity.ok()
 //                .header("accessToken", accessToken)
                 .body(accessToken);
+    }
+    @PostMapping("/find/id")
+    public ResponseEntity<?> sendFindIdMail(@RequestBody @Valid EmailDto.FindIdEmailRequest findIdEmailRequest) {
+        Member member = memberService.findUserByEmail(findIdEmailRequest.getReceiver())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+
+        String authCode = generateAuthCode();
+        memberService.saveFindIdConfirmAuthCode(findIdEmailRequest.getReceiver(), authCode);
+        mailService.mailSend(findIdEmailRequest.getReceiver(), authCode);
+        return ResponseEntity.ok()
+                .body(findIdEmailRequest.getReceiver());
+    }
+
+    @PostMapping("/find/id/confirm")
+    public ResponseEntity<?> confirmFindIdMail(@RequestBody @Valid ConfirmFindIdEmailRequest confirmFindIdEmailRequest) {
+        String findIdConfirmAuthCode = memberService.getFindIdConfirmAuthCode(confirmFindIdEmailRequest.getReceiver());
+
+        if (findIdConfirmAuthCode == null || !findIdConfirmAuthCode.equals(confirmFindIdEmailRequest.getCode())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        }
+
+        Member member = memberService.findUserByEmail(confirmFindIdEmailRequest.getReceiver())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+
+        if (!memberService.deleteFindIdConfirmAuthCode(confirmFindIdEmailRequest.getReceiver())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        }
+
+        return ResponseEntity.ok()
+                .body(new ConfirmFindIdEmailResponse(member.getUserId()));
+    }
+
+    @PostMapping("/find/pw")
+    public ResponseEntity<?> sendFindPwMail(@RequestBody FindPwEmailRequest findPwEmailRequest) {
+        Member member = memberService.findUserByEmail(findPwEmailRequest.getReceiver())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+
+        if (!member.getUserId().equals(findPwEmailRequest.getId())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "존재하지 않는 계정입니다.");
+        }
+
+        String authCode = generateAuthCode();
+        memberService.saveFindPwConfirmAuthCode(findPwEmailRequest.getReceiver(), authCode);
+        mailService.mailSend(findPwEmailRequest.getReceiver(), authCode);
+
+        return ResponseEntity.ok()
+                .body(findPwEmailRequest.getReceiver());
+    }
+
+    @PostMapping("/find/pw/confirm")
+    public ResponseEntity<?> confirmFindPwMail(@RequestBody @Valid ConfirmFindPwEmailRequest confirmFindPwEmailRequest) {
+        Member member = memberService.findUserByEmail(confirmFindPwEmailRequest.getReceiver())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+
+        String findIdConfirmAuthCode = memberService.getFindPwConfirmAuthCode(confirmFindPwEmailRequest.getReceiver());
+
+        if (findIdConfirmAuthCode == null || !findIdConfirmAuthCode.equals(confirmFindPwEmailRequest.getCode())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        }
+
+        member.setUserPassword(passwordEncoder.encode(confirmFindPwEmailRequest.getPw()));
+        Member save = memberService.save(member);
+
+        if (!memberService.deleteFindIdConfirmAuthCode(confirmFindPwEmailRequest.getReceiver())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        }
+
+        return ResponseEntity.ok()
+                .body(new ConfirmFindPwEmailResponse(save.getUserId()));
     }
 }
