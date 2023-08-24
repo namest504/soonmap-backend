@@ -56,6 +56,10 @@ public class MemberService implements UserDetailsService {
         return redisTemplate.opsForValue().get("RefreshToken-ADMIN-" + memberId);
     }
 
+    public String getUserRefreshToken(Long memberId) {
+        return redisTemplate.opsForValue().get("RefreshToken-User-" + memberId);
+    }
+
     public void saveFindIdConfirmAuthCode(String email, String code) {
         redisTemplate.opsForValue().set("FindIdCode-ADMIN-" + email, code, Duration.ofMinutes(3));
     }
