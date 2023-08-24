@@ -67,7 +67,7 @@ public class NoticeQueryDslRepository {
                 .where(notice.isTop.isFalse(), titleContains(title))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-//                .orderBy(notice.createAt.desc())
+                .orderBy(notice.createAt.desc())
                 .fetch();
 
         Long countNotice = queryFactory.select(notice.count())
