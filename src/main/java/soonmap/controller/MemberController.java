@@ -152,7 +152,7 @@ public class MemberController {
         if (memberService.findUserByEmail(memberEmailRequest.getEmail()).isPresent()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 입니다.");
         }
-        if (!memberEmailRequest.getEmailId().matches("^[a-z0-9]+$")) {
+        if (!memberEmailRequest.getEmail().matches("^[a-z0-9]+$")) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "입력된 형식이 올바르지 않습니다.");
         }
         String userEmailWithSCH = memberEmailRequest.getEmail() + "@sch.ac.kr";
