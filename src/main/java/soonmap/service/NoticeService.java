@@ -31,9 +31,9 @@ public class NoticeService {
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 공지사항"));
     }
 
-    public Page<Notice> findAll(int page, int length) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
-        return noticeRepository.findAll(pageRequest);
+    public Page<Notice> findAll(Pageable pageable) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
+        return noticeRepository.findAll(pageable);
     }
 
     public Long deleteById(Long id) {
@@ -44,19 +44,19 @@ public class NoticeService {
         return id;
     }
 
-    public Page<Notice> findByTitle(int page, int length, String title) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        return noticeRepository.findNoticesByTitleContaining(pageRequest, title);
+    public Page<Notice> findByTitle(Pageable pageable, String title) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return noticeRepository.findNoticesByTitleContaining(pageable, title);
     }
 
-    public Page<Notice> findByDate(int page, int length, LocalDateTime startDate, LocalDateTime endDate) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        return noticeRepository.findNoticesByCreateAtBetween(pageRequest, startDate, endDate);
+    public Page<Notice> findByDate(Pageable pageable, LocalDateTime startDate, LocalDateTime endDate) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return noticeRepository.findNoticesByCreateAtBetween(pageable, startDate, endDate);
     }
 
-    public Page<Notice> findByDateAndTitle(int page, int length, LocalDateTime startDate, LocalDateTime endDate, String title) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        return noticeRepository.findNoticesByCreateAtBetweenAndTitleContaining(pageRequest, startDate, endDate, title);
+    public Page<Notice> findByDateAndTitle(Pageable pageable, LocalDateTime startDate, LocalDateTime endDate, String title) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return noticeRepository.findNoticesByCreateAtBetweenAndTitleContaining(pageable, startDate, endDate, title);
     }
 
     public List<Notice> findAllByTop() {
@@ -72,8 +72,8 @@ public class NoticeService {
         return noticeQueryDslRepository.findNormalNotice(pageable, title);
     }
 
-    public Page<Notice> findAllByMember(int page, int length, Long memberId) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        return noticeQueryDslRepository.findAllByMemberId(memberId, pageRequest);
+    public Page<Notice> findAllByMember(Pageable pageable, Long memberId) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return noticeQueryDslRepository.findAllByMemberId(memberId, pageable);
     }
 }
