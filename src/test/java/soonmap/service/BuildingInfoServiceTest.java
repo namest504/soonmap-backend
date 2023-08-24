@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -100,9 +101,9 @@ public class BuildingInfoServiceTest {
         // Then
         assertEquals(2, buildingList.size());
         assertEquals(building1.getName(), buildingList.get(0).getName());
-        assertEquals(building1.getFloors(), buildingList.get(0).getFloors());
+        assertEquals(building1.getFloors(), buildingList.get(0).getFloorsUp());
         assertEquals(building2.getName(), buildingList.get(1).getName());
-        assertEquals(building2.getFloors(), buildingList.get(1).getFloors());
+        assertEquals(building2.getFloors(), buildingList.get(1).getFloorsUp());
         assertEquals(building1.getLongitude(), buildingList.get(0).getLongitude());
         assertEquals(building1.getLatitude(), buildingList.get(0).getLatitude());
         assertEquals(building1.getUniqueNumber(), buildingList.get(0).getUniqueNumber());
@@ -142,11 +143,11 @@ public class BuildingInfoServiceTest {
         // Then
         assertEquals(buildingResponseDtoList.get(0).getName(), buildings.get(0).getName());
         assertEquals(buildingResponseDtoList.get(0).getUniqueNumber(), buildings.get(0).getUniqueNumber());
-        assertEquals(buildingResponseDtoList.get(0).getFloors(), building1.getFloors());
+        assertEquals(buildingResponseDtoList.get(0).getFloorsUp(), building1.getFloors());
 
         assertEquals(buildingResponseDtoList.get(1).getName(), buildings.get(1).getName());
         assertEquals(buildingResponseDtoList.get(1).getUniqueNumber(), buildings.get(1).getUniqueNumber());
-        assertEquals(buildingResponseDtoList.get(1).getFloors(), building2.getFloors());
+        assertEquals(buildingResponseDtoList.get(1).getFloorsUp(), building2.getFloors());
     }
 
 }
