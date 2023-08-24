@@ -249,7 +249,7 @@ public class AdminController {
     public ResponseEntity<?> searchNotice(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Optional<LocalDateTime> startDate,
                                           @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Optional<LocalDateTime> endDate,
                                           @RequestParam(required = false) Optional<String> title,
-                                          @RequestParam int page) {
+                                          @PageableDefault(size = 9, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         List<NoticeResponse> noticeResponseList;
         int totalPage;
@@ -258,23 +258,23 @@ public class AdminController {
             if (title.isPresent()) {
                 // 시작일, 종료일, 제목 모두 존재할 때
 
-                Page<Notice> byDateAndTitle = noticeService.findByDateAndTitle(page, 9, startDate.get(), endDate.get(), title.get());
+                Page<Notice> byDateAndTitle = noticeService.findByDateAndTitle(pageable, startDate.get(), endDate.get(), title.get());
                 noticeResponseList = getCollect(byDateAndTitle);
                 totalPage = byDateAndTitle.getTotalPages();
             } else {
                 // 시작일, 종료일만 존재할 때
-                Page<Notice> byDate = noticeService.findByDate(page, 9, startDate.get(), endDate.get());
+                Page<Notice> byDate = noticeService.findByDate(pageable, startDate.get(), endDate.get());
                 noticeResponseList = getCollect(byDate);
                 totalPage = byDate.getTotalPages();
             }
         } else if (title.isPresent()) {
             // 제목만 존재할 때
-            Page<Notice> byTitle = noticeService.findByTitle(page, 9, title.get());
+            Page<Notice> byTitle = noticeService.findByTitle(pageable, title.get());
             noticeResponseList = getCollect(byTitle);
             totalPage = byTitle.getTotalPages();
         } else {
             // 전부 존재하지 않을 때
-            Page<Notice> all = noticeService.findAll(page, 9);
+            Page<Notice> all = noticeService.findAll(pageable);
             noticeResponseList = getCollect(all);
             totalPage = all.getTotalPages();
         }
@@ -289,9 +289,9 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/notice")
-    public ResponseEntity<?> getPageNotice(@RequestParam("page") int page) {
+    public ResponseEntity<?> getPageNotice(@PageableDefault(size = 9, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<Notice> all = noticeService.findAll(page, 9);
+        Page<Notice> all = noticeService.findAll(pageable);
         List<NoticeResponse> result = all.getContent()
                 .stream()
                 .map(NoticeResponse::of)
@@ -302,10 +302,10 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/notice/my")
-    public ResponseEntity<?> getPageMyNotice(@RequestParam("page") int page,
+    public ResponseEntity<?> getPageMyNotice(@PageableDefault(size = 9, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable,
                                              @AuthenticationPrincipal MemberPrincipal memberPrincipal) {
 
-        Page<Notice> all = noticeService.findAllByMember(page, 9, memberPrincipal.getMember().getId());
+        Page<Notice> all = noticeService.findAllByMember(pageable, memberPrincipal.getMember().getId());
         List<NoticeResponse> collect = all.getContent()
                 .stream()
                 .map(NoticeResponse::of)
@@ -397,9 +397,9 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @GetMapping("/article/category/page")
-    public ResponseEntity<?> getPageArticleCategory(@RequestParam("page") int page) {
+    public ResponseEntity<?> getPageArticleCategory(@PageableDefault(size = 10, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<ArticleType> articleTypePage = articleTypeService.findAll(page, 10);
+        Page<ArticleType> articleTypePage = articleTypeService.findAll(pageable);
         int totalPages = articleTypePage.getTotalPages();
         List<ArticleType> list = articleTypePage.getContent();
 
@@ -509,9 +509,9 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @GetMapping("/article/all")
-    public ResponseEntity<?> getArticle(@RequestParam int page) {
+    public ResponseEntity<?> getArticle(@PageableDefault(size = 9, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<Article> articles = articleService.findAllPage(page, 9);
+        Page<Article> articles = articleService.findAllPage(pageable);
         List<ArticleResponse> articleResponseList = articles.getContent()
                 .stream()
                 .map(ArticleResponse::of)
@@ -524,11 +524,11 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
     @GetMapping("/article/my")
     public ResponseEntity<?> getMemberArticle(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
-                                              @RequestParam int page) {
+                                              @PageableDefault(size = 9, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         Member member = memberService.findUserById(memberPrincipal.getMember().getId())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "인증되지 않은 유저 입니다."));
-        Page<Article> articles = articleService.findAllByMember(member.getId(), page, 9);
+        Page<Article> articles = articleService.findAllByMember(member.getId(), pageable);
         List<ArticleResponse> articleResponseList = articles
                 .getContent()
                 .stream()
@@ -645,9 +645,9 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/building")
-    public ResponseEntity<?> getPageBuildingInfo(@RequestParam int page) {
+    public ResponseEntity<?> getPageBuildingInfo(@PageableDefault Pageable pageable) {
 
-        Page<Building> pageAll = buildingInfoService.findPageAll(page, 10);
+        Page<Building> pageAll = buildingInfoService.findPageAll(pageable);
         List<BuildingResponseDto> result = pageAll.getContent()
                 .stream()
                 .map(BuildingResponseDto::of)

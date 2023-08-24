@@ -3,6 +3,7 @@ package soonmap.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import soonmap.entity.Building;
@@ -62,9 +63,9 @@ public class BuildingInfoService {
         return id;
     }
 
-    public Page<Building> findPageAll(int page, int length) {
-        PageRequest pageRequest = PageRequest.of(page, length);
-        return buildingRepository.findAll(pageRequest);
+    public Page<Building> findPageAll(Pageable pageable) {
+//        PageRequest pageRequest = PageRequest.of(page, length);
+        return buildingRepository.findAll(pageable);
     }
 
     public Optional<Building> findOneById(Long buildingId) {
