@@ -26,8 +26,8 @@ public class BuildingInfoDto {
     public static class BuildingResponseDto { // building의 정보를 반환할때 사용하는 dto입니다. 이름과 층, 설명을 반환합니다.
         private Long id;
         private String name;
-        private int floors;
-        private int underground;
+        private Integer floorsUp;
+        private Integer floorsDown;
         private String description;
         private double latitude; // 위도
         private double longitude; // 경도
@@ -36,7 +36,8 @@ public class BuildingInfoDto {
         public BuildingResponseDto(Building building) {
             this.id = building.getId();
             this.name = building.getName();
-            this.floors = building.getFloors();
+            this.floorsUp = building.getFloors();
+            this.floorsDown = building.getUnderground();
             this.description = building.getDescription();
             this.latitude = building.getLatitude();
             this.longitude = building.getLongitude();
@@ -64,9 +65,9 @@ public class BuildingInfoDto {
         @NotBlank
         private String name;
         @NotNull
-        private int floors;
+        private Integer floorsUp;
         @NotNull
-        private int underground;
+        private Integer floorsDown;
         @NotBlank
         private String description;
         @NotNull

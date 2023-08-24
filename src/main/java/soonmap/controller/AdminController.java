@@ -597,12 +597,12 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/building")
-    public ResponseEntity<?> uploadBuildingInfo(@RequestBody @Valid BuildingRequest buildingRequest) {
+    public ResponseEntity<Void> uploadBuildingInfo(@RequestBody @Valid BuildingRequest buildingRequest) {
 
         Building save = buildingInfoService.save(Building.builder()
                 .name(buildingRequest.getName())
-                .floors(buildingRequest.getFloors())
-                .underground(buildingRequest.getUnderground())
+                .floors(buildingRequest.getFloorsUp())
+                .underground(buildingRequest.getFloorsDown())
                 .latitude(buildingRequest.getLatitude())
                 .longitude(buildingRequest.getLongitude())
                 .uniqueNumber(buildingRequest.getUniqueNumber())
@@ -610,7 +610,7 @@ public class AdminController {
                 .build());
 
         return ResponseEntity.ok()
-                .body(save);
+                .build();
     }
 
     @Secured("ROLE_ADMIN")
@@ -621,8 +621,8 @@ public class AdminController {
         Building save = buildingInfoService.save(Building.builder()
                 .id(id)
                 .name(buildingRequest.getName())
-                .floors(buildingRequest.getFloors())
-                .underground(buildingRequest.getUnderground())
+                .floors(buildingRequest.getFloorsUp())
+                .underground(buildingRequest.getFloorsDown())
                 .latitude(buildingRequest.getLatitude())
                 .longitude(buildingRequest.getLongitude())
                 .uniqueNumber(buildingRequest.getUniqueNumber())
