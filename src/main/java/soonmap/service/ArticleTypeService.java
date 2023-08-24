@@ -3,6 +3,7 @@ package soonmap.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,9 +34,9 @@ public class ArticleTypeService {
         return articleTypeRepository.findAll();
     }
 
-    public Page<ArticleType> findAll(int page, int length) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
-        return articleTypeRepository.findAll(pageRequest);
+    public Page<ArticleType> findAll(Pageable pageable) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "id");
+        return articleTypeRepository.findAll(pageable);
     }
 
     public Long deleteById(Long id) {

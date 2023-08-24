@@ -29,14 +29,14 @@ public class ArticleService {
         return articleRepository.findById(id);
     }
 
-    public Page<Article> findAllPage(int page, int length) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        return articleRepository.findAll(pageRequest);
+    public Page<Article> findAllPage(Pageable pageable) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return articleRepository.findAll(pageable);
     }
 
-    public Page<Article> findAllByMember(Long memberId, int page, int length) {
-        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
-        return articleQuerydslRepository.findAllByMemberId(memberId, pageRequest);
+    public Page<Article> findAllByMember(Long memberId, Pageable pageable) {
+//        PageRequest pageRequest = PageRequest.of(page, length, Sort.Direction.DESC, "createAt");
+        return articleQuerydslRepository.findAllByMemberId(memberId, pageable);
     }
 
     public Long deleteById(Long id) {
