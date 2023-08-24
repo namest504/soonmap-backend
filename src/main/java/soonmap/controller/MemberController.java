@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -27,6 +28,7 @@ import soonmap.entity.Member;
 import soonmap.exception.CustomException;
 import soonmap.security.jwt.JwtProvider;
 
+import soonmap.security.jwt.MemberPrincipal;
 import soonmap.security.oauth.KakaoLoginBO;
 import soonmap.security.oauth.NaverLoginBO;
 import soonmap.service.MailService;
@@ -298,5 +300,18 @@ public class MemberController {
 
         return ResponseEntity.ok()
                 .body(new ConfirmFindPwEmailResponse(save.getUserId()));
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Boolean> logoutUser(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+        Boolean result = memberService.logoutUserRefreshToken(memberPrincipal.getMember().getId());
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<Boolean> withdrawUser(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+        Boolean result = memberService.withdrawUser(memberPrincipal.getMember().getId());
+        return ResponseEntity.ok()
+                .body(result);
     }
 }
