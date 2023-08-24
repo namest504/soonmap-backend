@@ -597,7 +597,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/building")
-    public ResponseEntity<Void> uploadBuildingInfo(@RequestBody @Valid BuildingRequest buildingRequest) {
+    public ResponseEntity<BuildingResponseDto> uploadBuildingInfo(@RequestBody @Valid BuildingRequest buildingRequest) {
 
         Building save = buildingInfoService.save(Building.builder()
                 .name(buildingRequest.getName())
@@ -610,7 +610,7 @@ public class AdminController {
                 .build());
 
         return ResponseEntity.ok()
-                .build();
+                .body(BuildingResponseDto.of(save));
     }
 
     @Secured("ROLE_ADMIN")
