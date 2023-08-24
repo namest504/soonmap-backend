@@ -221,9 +221,8 @@ public class MemberController {
         Long uid = claims.get("uid", Long.class);
         Member member = memberService.findUserById(uid)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."));
-        ;
 
-        if (memberService.getAdminRefreshToken(member.getId()) == null) {
+        if (memberService.getUserRefreshToken(member.getId()) == null) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 요청입니다.");
         }
 
