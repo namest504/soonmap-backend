@@ -303,8 +303,15 @@ public class MemberController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logoutAdmin(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+    public ResponseEntity<Boolean> logoutUser(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
         Boolean result = memberService.logoutUserRefreshToken(memberPrincipal.getMember().getId());
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<Boolean> withdrawUser(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+        Boolean result = memberService.withdrawUser(memberPrincipal.getMember().getId());
+        return ResponseEntity.ok()
+                .body(result);
     }
 }
