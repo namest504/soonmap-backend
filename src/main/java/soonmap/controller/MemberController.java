@@ -301,7 +301,7 @@ public class MemberController {
                 .body(new ConfirmFindPwEmailResponse(save.getUserId()));
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<Boolean> logoutUser(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
         Boolean result = memberService.logoutUserRefreshToken(memberPrincipal.getMember().getId());
         return ResponseEntity.ok(result);
