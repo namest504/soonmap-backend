@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import soonmap.entity.Article;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,22 +63,27 @@ public class ArticleQuerydslRepository {
     public List<Article> findMainArticles() {
         List<Article> result = new ArrayList<>();
 
-        Article recentArticle = queryFactory.selectFrom(article)
-                .where(article.createAt.before(LocalDateTime.now().minusDays(1)))
-                .fetchFirst();
+        List<Article> recentArticle = queryFactory.selectFrom(article)
+                .where(article.createAt.between(LocalDateTime.now().minusDays(1), LocalDateTime.now(ZoneId.of("Asia/Seoul"))))
+                .offset(0)
+                .limit(3)
+                .orderBy(article.view.asc())
+                .fetch();
 
         if (recentArticle != null) {
-            result.add(recentArticle);
+            result.addAll(recentArticle);
             List<Article> articleList = queryFactory.selectFrom(article)
-                    .where(article.ne(recentArticle))
+                    .where(article.notIn(recentArticle))
                     .offset(0)
-                    .limit(5)
+                    .limit(3)
+                    .orderBy(article.view.desc())
                     .fetch();
             result.addAll(articleList);
         } else {
             List<Article> articleList = queryFactory.selectFrom(article)
                     .offset(0)
                     .limit(6)
+                    .orderBy(article.view.desc())
                     .fetch();
             result.addAll(articleList);
         }
