@@ -34,6 +34,8 @@ public class SecurityConfig {
                 .cors()
                 .and()
                 .csrf().disable()
+                .logout()
+                .disable()
                 .formLogin()
                 .disable()
                 .headers().frameOptions()
