@@ -53,8 +53,17 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(authenticationFilter, JwtAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/admin/login","/admin/refresh","/**").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/admin/login",
+                        "/admin/refresh",
+                        "/admin/register",
+                        "/admin/logout",
+                        "/admin/find/id",
+                        "/admin/find/id/confirm",
+                        "/admin/find/pw",
+                        "/admin/find/pw/confirm",
+                        "/article/main").permitAll()
+                .antMatchers("/admin/**","/upload/**","/article/**").authenticated()
+                .anyRequest().permitAll();
 
         return http.build();
     }
