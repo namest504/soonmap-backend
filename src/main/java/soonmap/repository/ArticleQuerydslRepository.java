@@ -21,6 +21,7 @@ import static soonmap.entity.QArticle.article;
 public class ArticleQuerydslRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final int MAIN_ARTICLE_COUNT = 6;
 
     public Page<Article> findArticlesByCondition(String typeName, LocalDateTime startDate, LocalDateTime endDate, String title, Pageable pageable) {
 
@@ -64,27 +65,37 @@ public class ArticleQuerydslRepository {
         List<Article> result = new ArrayList<>();
 
         List<Article> recentArticle = queryFactory.selectFrom(article)
-                .where(article.createAt.between(LocalDateTime.now().minusDays(1), LocalDateTime.now(ZoneId.of("Asia/Seoul"))))
+                .where(dateBetween(LocalDateTime.now().minusDays(1), LocalDateTime.now(ZoneId.of("Asia/Seoul"))))
                 .offset(0)
-                .limit(3)
+                .limit(2)
                 .orderBy(article.view.asc())
                 .fetch();
 
         if (recentArticle != null) {
             result.addAll(recentArticle);
             List<Article> articleList = queryFactory.selectFrom(article)
-                    .where(article.notIn(recentArticle))
+                    .where(article.notIn(recentArticle),
+                            dateBetween(LocalDateTime.now().minusDays(7), LocalDateTime.now(ZoneId.of("Asia/Seoul"))))
                     .offset(0)
-                    .limit(3)
+                    .limit(MAIN_ARTICLE_COUNT - recentArticle.size())
                     .orderBy(article.view.desc())
                     .fetch();
             result.addAll(articleList);
         } else {
             List<Article> articleList = queryFactory.selectFrom(article)
+                    .where(dateBetween(LocalDateTime.now().minusDays(7), LocalDateTime.now(ZoneId.of("Asia/Seoul"))))
                     .offset(0)
-                    .limit(6)
+                    .limit(MAIN_ARTICLE_COUNT)
                     .orderBy(article.view.desc())
                     .fetch();
+
+            if (articleList.size() < MAIN_ARTICLE_COUNT) {
+                articleList = queryFactory.selectFrom(article)
+                        .offset(0)
+                        .limit(MAIN_ARTICLE_COUNT)
+                        .orderBy(article.view.desc())
+                        .fetch();
+            }
             result.addAll(articleList);
         }
 
