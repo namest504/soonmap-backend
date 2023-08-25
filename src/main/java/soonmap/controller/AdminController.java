@@ -116,7 +116,7 @@ public class AdminController {
                 .body(new AdminResisterResponse(true, member.isAdmin(), member.isManager(), member.isStaff()));
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<?> logoutAdmin(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
         Boolean result = memberService.logoutAdminRefreshToken(memberPrincipal.getMember().getId());
         return ResponseEntity.ok(result);
