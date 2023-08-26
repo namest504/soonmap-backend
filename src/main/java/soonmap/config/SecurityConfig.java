@@ -63,6 +63,9 @@ public class SecurityConfig {
                         "/admin/find/id/confirm",
                         "/admin/find/pw",
                         "/admin/find/pw/confirm",
+                        "/admin/change/pw",
+                        "/admin/change/email",
+                        "/admin/change/email/confirm",
                         "/article/main").permitAll()
                 .antMatchers("/admin/**","/upload/**","/article/**").authenticated()
                 .anyRequest().permitAll();
