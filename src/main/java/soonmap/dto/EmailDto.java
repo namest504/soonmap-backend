@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class EmailDto {
@@ -36,6 +37,14 @@ public class EmailDto {
         private String code;
         @Email
         private String receiver;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ConfirmChangePwRequest {
+        @NotNull
+        private String token;
         @NotBlank
         private String pw;
     }

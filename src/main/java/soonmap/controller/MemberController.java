@@ -290,12 +290,23 @@ public class MemberController {
             throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
         }
 
-        member.setUserPassword(passwordEncoder.encode(confirmFindPwEmailRequest.getPw()));
-        Member save = memberService.save(member);
-
-        if (!memberService.deleteFindIdConfirmAuthCode(confirmFindPwEmailRequest.getReceiver())) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        if (!memberService.deleteFindPwConfirmAuthCode(confirmFindPwEmailRequest.getReceiver())) {
+            throw new CustomException(HttpStatus.NOT_FOUND, "인증에 문제가 발생하였습니다.");
         }
+
+        String authConfirmToken = jwtProvider.createChangePwConfirmToken(confirmFindPwEmailRequest.getReceiver());
+        return ResponseEntity.ok()
+                .body(new ChangePwConfirmResponse(authConfirmToken));
+    }
+
+
+    @PostMapping("/change/pw")
+    public ResponseEntity<?> changePw(@RequestBody @Valid EmailDto.ConfirmChangePwRequest confirmChangePwRequest){
+        String email = jwtProvider.decodeJwtToken(confirmChangePwRequest.getToken()).get("email", String.class);
+        Member member = memberService.findUserByEmail(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "토큰이 올바르지 않습니다."));
+        member.setUserPassword(passwordEncoder.encode(confirmChangePwRequest.getPw()));
+        Member save = memberService.save(member);
 
         return ResponseEntity.ok()
                 .body(new ConfirmFindPwEmailResponse(save.getUserId()));
