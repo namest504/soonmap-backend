@@ -24,7 +24,7 @@ public class MemberQuerydslRepository {
                 .where(member.accountType.eq(AccountType.ADMIN))
 //                .where(member.accountType.eq(AccountType.valueOf("ADMIN")))
                 .offset(pageable.getOffset())
-                .offset(pageable.getPageSize())
+                .limit(pageable.getPageSize())
                 .orderBy(member.id.asc())
                 .fetch();
 
@@ -45,7 +45,7 @@ public class MemberQuerydslRepository {
         List<Member> memberList = queryFactory.selectFrom(member)
                 .where(member.accountType.eq(AccountType.BASIC))
                 .offset(pageable.getOffset())
-                .offset(pageable.getPageSize())
+                .limit(pageable.getPageSize())
                 .orderBy(member.id.asc())
                 .fetch();
 
