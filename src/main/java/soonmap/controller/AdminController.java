@@ -216,6 +216,40 @@ public class AdminController {
                 .body(Account.of(member));
     }
 
+    @PostMapping("/change/email")
+    public ResponseEntity<?> changeEmail(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
+                                         @RequestBody @Valid ChangeEmailRequest changeEmailRequest){
+        Member member = memberService.findUserById(memberPrincipal.getMember().getId())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+
+        if (memberService.findUserByEmail(changeEmailRequest.getNewEmail()).isPresent()){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "이미 사용중인 이메일 입니다.");
+        }
+
+        String authCode = generateAuthCode();
+        memberService.saveChangeEmailConfirmAuthCode(changeEmailRequest.getNewEmail(), authCode);
+        mailService.mailSend(changeEmailRequest.getNewEmail(), authCode);
+        return ResponseEntity.ok()
+                .body(changeEmailRequest.getNewEmail());
+    }
+
+    @PostMapping("/change/email/confirm")
+    public ResponseEntity<?> changeEmailConfirm(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
+                                                @RequestBody @Valid ChangeEmailConfirmRequest changeEmailConfirmRequest){
+        Member member = memberService.findUserById(memberPrincipal.getMember().getId())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+        String changeEmailConfirmAuthCode = memberService.getChangeEmailConfirmAuthCode(changeEmailConfirmRequest.getNewEmail());
+
+        if (changeEmailConfirmAuthCode == null || !changeEmailConfirmAuthCode.equals(changeEmailConfirmRequest.getCode())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "인증에 문제가 발생하였습니다.");
+        }
+        member.updateEmail(changeEmailConfirmRequest.getNewEmail());
+        Member save = memberService.save(member);
+        return ResponseEntity.ok()
+                .body(Account.of(save));
+    }
+
+
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/account/admin")
     public ResponseEntity<AccountListResponse> getAdminAccount() {

@@ -92,6 +92,18 @@ public class MemberService implements UserDetailsService {
         return redisTemplate.opsForValue().get("JoinCode-User-" + email);
     }
 
+    public void saveChangeEmailConfirmAuthCode(String email, String code) {
+        redisTemplate.opsForValue().set("ChangeEmail-ADMIN-" + email, code, Duration.ofMinutes(3));
+    }
+
+    public String getChangeEmailConfirmAuthCode(String email) {
+        return redisTemplate.opsForValue().get("ChangeEmail-ADMIN-" + email);
+    }
+
+    public Boolean deleteChangeEmailConfirmAuthCode(String email) {
+        return redisTemplate.delete("ChangeEmail-ADMIN-" + email);
+    }
+
     public void validateDuplicatedId(String id) {
         memberRepository.findMemberByUserId(id)
                 .ifPresent(p -> {
