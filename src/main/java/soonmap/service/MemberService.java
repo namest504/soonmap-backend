@@ -291,4 +291,10 @@ public class MemberService implements UserDetailsService {
         memberRepository.deleteById(uid);
         return logoutUserRefreshToken(uid);
     }
+
+    public CountAccount countAccount() {
+        Long adminAccount = memberQuerydslRepository.countAdminAccount();
+        Long userAccount = memberQuerydslRepository.countUserAccount();
+        return new CountAccount(adminAccount, userAccount);
+    }
 }

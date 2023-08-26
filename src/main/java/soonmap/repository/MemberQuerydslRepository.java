@@ -31,7 +31,6 @@ public class MemberQuerydslRepository {
         Long memberCount = queryFactory.select(member.count())
                 .from(member)
                 .where(member.accountType.eq(AccountType.ADMIN))
-                .orderBy(member.id.asc())
                 .fetchOne();
 
         if (memberCount == null) {
@@ -52,7 +51,6 @@ public class MemberQuerydslRepository {
         Long memberCount = queryFactory.select(member.count())
                 .from(member)
                 .where(member.accountType.eq(AccountType.BASIC))
-                .orderBy(member.id.asc())
                 .fetchOne();
 
         if (memberCount == null) {
@@ -60,5 +58,19 @@ public class MemberQuerydslRepository {
         }
 
         return new PageImpl<>(memberList, pageable, memberCount);
+    }
+
+    public Long countAdminAccount() {
+        return queryFactory.select(member.count())
+                .from(member)
+                .where(member.accountType.eq(AccountType.ADMIN))
+                .fetchOne();
+    }
+
+    public Long countUserAccount() {
+        return queryFactory.select(member.count())
+                .from(member)
+                .where(member.accountType.eq(AccountType.BASIC))
+                .fetchOne();
     }
 }

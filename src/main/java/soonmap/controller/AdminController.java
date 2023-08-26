@@ -290,6 +290,14 @@ public class AdminController {
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @GetMapping("/account/count")
+    public ResponseEntity<CountAccount> countAllAccount() {
+        CountAccount countAccount = memberService.countAccount();
+        return ResponseEntity.ok()
+                .body(countAccount);
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @PatchMapping("/manage/ban")
     public ResponseEntity<Account> modifyIsBanAccount(@RequestParam Long id) {
         Member member = memberService.findUserById(id)
