@@ -154,7 +154,7 @@ public class AdminController {
     }
 
     private String generateAuthCode() {
-        return String.valueOf((int) (Math.random() * 1000000) + 100000);
+        return String.valueOf((int) (Math.random() * 900000) + 100000);
     }
 
     @PostMapping("/find/pw")
@@ -205,6 +205,15 @@ public class AdminController {
 
         return ResponseEntity.ok()
                 .body(new ConfirmFindPwEmailResponse(save.getUserId()));
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
+    @GetMapping("/me")
+    public ResponseEntity<?> aboutMe(@AuthenticationPrincipal MemberPrincipal memberPrincipal) {
+        Member member = memberService.findUserById(memberPrincipal.getMember().getId())
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
+        return ResponseEntity.ok()
+                .body(Account.of(member));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
