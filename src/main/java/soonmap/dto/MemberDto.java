@@ -181,5 +181,13 @@ public class MemberDto {
         @NotNull
         private String code;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CountAccount {
+        private Long AdminCount;
+        private Long UserCount;
+    }
 }
 
