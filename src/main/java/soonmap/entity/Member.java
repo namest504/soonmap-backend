@@ -124,4 +124,8 @@ public class Member implements UserDetails {
     public void updateAdmin() {
         this.isAdmin = !this.isAdmin;
     }
+
+    public void updateEmail(String email){
+        this.userEmail = email;
+    }
 }
