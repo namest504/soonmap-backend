@@ -164,5 +164,22 @@ public class MemberDto {
         private String pw;
     }
 
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChangeEmailRequest {
+        @Email
+        private String newEmail;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChangeEmailConfirmRequest {
+        @Email
+        private String newEmail;
+        @NotNull
+        private String code;
+    }
 }
 
