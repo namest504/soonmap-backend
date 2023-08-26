@@ -146,6 +146,13 @@ public class MemberDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class ChangePwConfirmResponse {
+        private String confirmToken;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MemberJoinRequest {
         @NotNull
         private String registerToken;
