@@ -186,8 +186,8 @@ public class MemberDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CountAccount {
-        private Long AdminCount;
-        private Long UserCount;
+        private Long adminCount;
+        private Long userCount;
     }
 }
 
