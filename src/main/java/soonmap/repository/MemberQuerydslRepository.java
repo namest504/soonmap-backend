@@ -21,7 +21,8 @@ public class MemberQuerydslRepository {
 
     public Page<Member> findAdminAccount(Pageable pageable){
         List<Member> memberList = queryFactory.selectFrom(member)
-                .where(member.accountType.eq(AccountType.valueOf("ADMIN")))
+                .where(member.accountType.eq(AccountType.ADMIN))
+//                .where(member.accountType.eq(AccountType.valueOf("ADMIN")))
                 .offset(pageable.getOffset())
                 .offset(pageable.getPageSize())
                 .orderBy(member.id.asc())
@@ -29,7 +30,7 @@ public class MemberQuerydslRepository {
 
         Long memberCount = queryFactory.select(member.count())
                 .from(member)
-                .where(member.accountType.eq(AccountType.valueOf("ADMIN")))
+                .where(member.accountType.eq(AccountType.ADMIN))
                 .orderBy(member.id.asc())
                 .fetchOne();
 
@@ -42,7 +43,7 @@ public class MemberQuerydslRepository {
 
     public Page<Member> findUserAccount(Pageable pageable){
         List<Member> memberList = queryFactory.selectFrom(member)
-                .where(member.accountType.eq(AccountType.valueOf("BASIC")))
+                .where(member.accountType.eq(AccountType.BASIC))
                 .offset(pageable.getOffset())
                 .offset(pageable.getPageSize())
                 .orderBy(member.id.asc())
@@ -50,7 +51,7 @@ public class MemberQuerydslRepository {
 
         Long memberCount = queryFactory.select(member.count())
                 .from(member)
-                .where(member.accountType.eq(AccountType.valueOf("BASIC")))
+                .where(member.accountType.eq(AccountType.BASIC))
                 .orderBy(member.id.asc())
                 .fetchOne();
 
