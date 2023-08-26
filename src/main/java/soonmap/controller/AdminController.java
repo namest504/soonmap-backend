@@ -252,18 +252,31 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/account/admin")
-    public ResponseEntity<AccountListResponse> getAdminAccount() {
+    public ResponseEntity<AccountListResponse> getAdminAccount(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 
-        List<Member> adminAccount = memberService.findAdminAccount();
-        List<Account> collect = adminAccount.stream().map(Account::of).collect(Collectors.toList());
-
+//        List<Member> adminAccount = memberService.findAdminAccount(pageable);
+        Page<Member> adminAccount = memberService.findAdminAccount(pageable);
+        List<Account> collect = adminAccount.stream()
+                .map(Account::of)
+                .collect(Collectors.toList());
         return ResponseEntity.ok()
-                .body(new AccountListResponse(adminAccount.size(), collect));
+                .body(new AccountListResponse(adminAccount.getTotalPages(), collect));
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
+    @GetMapping("/account/user")
+    public ResponseEntity<?> getUserAccount(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+        Page<Member> userAccount = memberService.findUserAccount(pageable);
+        List<Account> collect = userAccount.stream()
+                .map(Account::of)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok()
+                .body(new AccountListResponse(userAccount.getTotalPages(), collect));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/account/all")
-    public ResponseEntity<AccountListResponse> getAllAccount() {
+    public ResponseEntity<AccountListResponse> getAllAccount(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 
         List<Member> adminAccount = memberService.findAll();
         List<Account> collect = adminAccount.stream()
