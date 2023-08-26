@@ -256,7 +256,8 @@ public class AdminController {
 
 //        List<Member> adminAccount = memberService.findAdminAccount(pageable);
         Page<Member> adminAccount = memberService.findAdminAccount(pageable);
-        List<Account> collect = adminAccount.stream()
+        List<Account> collect = adminAccount.getContent()
+                .stream()
                 .map(Account::of)
                 .collect(Collectors.toList());
         return ResponseEntity.ok()
@@ -267,7 +268,8 @@ public class AdminController {
     @GetMapping("/account/user")
     public ResponseEntity<?> getUserAccount(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         Page<Member> userAccount = memberService.findUserAccount(pageable);
-        List<Account> collect = userAccount.stream()
+        List<Account> collect = userAccount.getContent()
+                .stream()
                 .map(Account::of)
                 .collect(Collectors.toList());
         return ResponseEntity.ok()
