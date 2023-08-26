@@ -106,4 +106,17 @@ public class JwtProvider {
                 .signWith(SignatureAlgorithm.HS256, Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
                 .compact();
     }
+
+    public String createChangePwConfirmToken(String email) {
+        Claims claims = Jwts.claims().setSubject("confirm_token");
+        claims.put("email", email);
+        Date currentTime = new Date();
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(currentTime)
+                .setExpiration(new Date(currentTime.getTime() + 1000 * 60 * 3))
+                .signWith(SignatureAlgorithm.HS256, Base64Utils.encodeToString(JWT_SECRET_KEY.getBytes()))
+                .compact();
+    }
 }
