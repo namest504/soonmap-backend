@@ -165,7 +165,7 @@ public class MemberController {
                 .build();
     }
     private String generateAuthCode() {
-        return String.valueOf((int) (Math.random() * 1000000) + 100000);
+        return String.valueOf((int) (Math.random() * 900000) + 100000);
     }
 
     @PostMapping("/join/check/confirm")
