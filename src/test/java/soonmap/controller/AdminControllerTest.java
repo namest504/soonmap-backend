@@ -21,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -225,7 +226,7 @@ public class AdminControllerTest {
         Member adminAccount3 = new Member(3L, "testid3", "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, true, "testSnsId", LocalDateTime.now());
         List<Member> memberList = Arrays.asList(adminAccount1, adminAccount3);
 
-        given(memberService.findAdminAccount()).willReturn(memberList);
+        given(memberService.findAdminAccount(any())).willReturn((Page<Member>) memberList);
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/admin/account/admin"));
@@ -275,7 +276,7 @@ public class AdminControllerTest {
         Member adminAccount2 = new Member(2L, "testid2", "test2@email.com", "test2", "testPassword2", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
         Member adminAccount3 = new Member(3L, "testid3", "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, true, "testSnsId", LocalDateTime.now());
         List<Member> memberList = Arrays.asList(adminAccount1, adminAccount2, adminAccount3);
-        given(memberService.findAdminAccount()).willReturn(memberList);
+        given(memberService.findAdminAccount(any())).willReturn((Page<Member>) memberList);
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/admin/account"));
@@ -295,7 +296,7 @@ public class AdminControllerTest {
         Member adminAccount2 = new Member(2L, "testid2", "test2@email.com", "test2", "testPassword2", AccountType.ADMIN, false, true, true, true, "testSnsId", LocalDateTime.now());
         Member adminAccount3 = new Member(3L, "testid3", "test3@email.com", "test3", "testPassword3", AccountType.ADMIN, false, false, true, true, "testSnsId", LocalDateTime.now());
         List<Member> memberList = Arrays.asList(adminAccount1, adminAccount2, adminAccount3);
-        given(memberService.findAdminAccount()).willReturn(memberList);
+        given(memberService.findAdminAccount(any())).willReturn((Page<Member>) memberList);
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/admin/account/all"));
