@@ -3,6 +3,8 @@ package soonmap.service;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -17,6 +19,7 @@ import soonmap.dto.MemberDto.AdminResisterRequest;
 import soonmap.entity.AccountType;
 import soonmap.entity.Member;
 import soonmap.exception.CustomException;
+import soonmap.repository.MemberQuerydslRepository;
 import soonmap.repository.MemberRepository;
 
 
@@ -33,6 +36,7 @@ import static soonmap.dto.MemberDto.*;
 public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
+    private final MemberQuerydslRepository memberQuerydslRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -111,9 +115,16 @@ public class MemberService implements UserDetailsService {
                 });
     }
 
-    public List<Member> findAdminAccount() {
-        List<Member> adminsByAccountTypeAdmin = memberRepository.findAdminsByAccountType(AccountType.ADMIN);
-        return adminsByAccountTypeAdmin;
+//    public List<Member> findAdminAccount() {
+//        List<Member> adminsByAccountTypeAdmin = memberRepository.findAdminsByAccountType(AccountType.ADMIN);
+//        return adminsByAccountTypeAdmin;
+//    }
+    public Page<Member> findAdminAccount(Pageable pageable){
+        return memberQuerydslRepository.findAdminAccount(pageable);
+    }
+
+    public Page<Member> findUserAccount(Pageable pageable){
+        return memberQuerydslRepository.findUserAccount(pageable);
     }
 
     public Member addAdmin(AdminResisterRequest adminResisterRequest) {
