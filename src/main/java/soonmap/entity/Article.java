@@ -24,6 +24,8 @@ public class Article {
     @Lob
     private String content;
 
+    private String thumbnail;
+
     @Column(nullable = false)
     private LocalDateTime createAt;
 
