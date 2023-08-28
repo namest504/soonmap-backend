@@ -20,6 +20,13 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
+      - uses: actions/checkout@v3
+      - name: Make application.properties
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.PROPERTIES_TEST }}" > src/main/resources/application-test.yml
+          find src
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
@@ -31,7 +38,7 @@ jobs:
       - name: Docker build
         run: |
           docker login -u ${{ secrets.DOCKER_ID }} -p ${{ secrets.DOCKER_PW }}
-          docker build -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }} .
+          docker build --build-arg PROFILE test -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }} .
           docker push ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
 
       - name: EC2 Deploy
