@@ -78,7 +78,7 @@ public class JwtProvider {
 
             return true;
         } catch (Exception e) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다.");
+            throw new CustomException(HttpStatus.valueOf(998), "잘못된 토큰입니다.");
         }
     }
 
@@ -90,7 +90,7 @@ public class JwtProvider {
         } catch (SecurityException | MalformedJwtException | ExpiredJwtException
                  | UnsupportedJwtException
                  | IllegalArgumentException | SignatureException e) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 접근입니다.");
+            throw new CustomException(HttpStatus.valueOf(999), "잘못된 접근입니다.");
         }
     }
 
