@@ -1,20 +1,16 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:test
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:mysql://local:3306/soonmaptest
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
     properties:
       hibernate:
-        ddl-auto: create
-        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         show_sql: true
   servlet:
@@ -37,10 +33,6 @@ spring:
     profile-api-url: https://kapi.kakao.com/v2/user/me
     client_secret: ${KAKAO_CLIENT_SECRET}
 
-JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-REDIS_ENDPOINT: ${REDIS_ENDPOINT}
-
-
 # S3
 cloud:
   aws:
@@ -55,3 +47,5 @@ cloud:
       auto: false
 
 CLOUD_FRONT_URL: ${CLOUD_FRONT_URL}
+JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+REDIS_ENDPOINT: ${REDIS_ENDPOINT}
