@@ -100,7 +100,7 @@ public class ArticleDto {
         private String title;
         @NotBlank
         private String content;
-        private String thumbNail;
+        private String thumbnail;
         @NotBlank
         private String articleTypeName;
     }

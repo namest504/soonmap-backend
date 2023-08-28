@@ -562,7 +562,7 @@ public class AdminController {
         Article save = articleService.save(Article.builder()
                 .title(createArticleRequest.getTitle())
                 .content(createArticleRequest.getContent())
-                .thumbnail(createArticleRequest.getThumbNail())
+                .thumbnail(createArticleRequest.getThumbnail())
                 .articleType(articleType)
                 .createAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .member(memberPrincipal.getMember())
