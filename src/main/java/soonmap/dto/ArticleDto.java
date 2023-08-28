@@ -27,13 +27,53 @@ public class ArticleDto {
         private Long id;
         private String title;
         private String content;
+        private String thumbnail;
         private LocalDateTime createAt;
         private String writer;
         private String articleTypeName;
         private int view;
 
         public static ArticleResponse of(Article article) {
-            return new ArticleResponse(article.getId(), article.getTitle(), article.getContent(), article.getCreateAt(), article.getMember().getUsername(), article.getArticleType().getTypeName(), article.getView());
+            return new ArticleResponse(
+                    article.getId(),
+                    article.getTitle(), article.getContent(),
+                    article.getThumbnail(),
+                    article.getCreateAt(),
+                    article.getMember().getUsername(),
+                    article.getArticleType().getTypeName(),
+                    article.getView());
+        }
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ArticlePageResponseWithOutContent {
+        private int totalPage;
+        private List<ArticleResponseWithOutContent> articleList;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ArticleResponseWithOutContent {
+        private Long id;
+        private String title;
+        private String thumbnail;
+        private LocalDateTime createAt;
+        private String writer;
+        private String articleTypeName;
+        private int view;
+
+        public static ArticleResponseWithOutContent of(Article article) {
+            return new ArticleResponseWithOutContent(
+                    article.getId(),
+                    article.getTitle(),
+                    article.getThumbnail(),
+                    article.getCreateAt(),
+                    article.getMember().getUsername(),
+                    article.getArticleType().getTypeName(),
+                    article.getView());
         }
     }
 
@@ -70,6 +110,7 @@ public class ArticleDto {
         private String title;
         @NotBlank
         private String content;
+        private String thumbnail;
         @NotBlank
         private String articleTypeName;
     }
@@ -83,6 +124,7 @@ public class ArticleDto {
         private String title;
         @NotBlank
         private String content;
+        private String thumbnail;
         @NotBlank
         private String articleTypeName;
     }
@@ -94,6 +136,7 @@ public class ArticleDto {
         private boolean success;
         private Long id;
         private String title;
+        private String thumbnail;
     }
 
 }

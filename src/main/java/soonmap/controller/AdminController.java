@@ -196,7 +196,7 @@ public class AdminController {
 
 
     @PostMapping("/change/pw")
-    public ResponseEntity<?> changePw(@RequestBody @Valid ConfirmChangePwRequest confirmChangePwRequest){
+    public ResponseEntity<?> changePw(@RequestBody @Valid ConfirmChangePwRequest confirmChangePwRequest) {
         String email = jwtProvider.decodeJwtToken(confirmChangePwRequest.getToken()).get("email", String.class);
         Member member = memberService.findUserByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "토큰이 올바르지 않습니다."));
@@ -218,11 +218,11 @@ public class AdminController {
 
     @PostMapping("/change/email")
     public ResponseEntity<?> changeEmail(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
-                                         @RequestBody @Valid ChangeEmailRequest changeEmailRequest){
+                                         @RequestBody @Valid ChangeEmailRequest changeEmailRequest) {
         Member member = memberService.findUserById(memberPrincipal.getMember().getId())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
 
-        if (memberService.findUserByEmail(changeEmailRequest.getNewEmail()).isPresent()){
+        if (memberService.findUserByEmail(changeEmailRequest.getNewEmail()).isPresent()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이미 사용중인 이메일 입니다.");
         }
 
@@ -235,7 +235,7 @@ public class AdminController {
 
     @PostMapping("/change/email/confirm")
     public ResponseEntity<?> changeEmailConfirm(@AuthenticationPrincipal MemberPrincipal memberPrincipal,
-                                                @RequestBody @Valid ChangeEmailConfirmRequest changeEmailConfirmRequest){
+                                                @RequestBody @Valid ChangeEmailConfirmRequest changeEmailConfirmRequest) {
         Member member = memberService.findUserById(memberPrincipal.getMember().getId())
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 계정입니다."));
         String changeEmailConfirmAuthCode = memberService.getChangeEmailConfirmAuthCode(changeEmailConfirmRequest.getNewEmail());
@@ -266,7 +266,7 @@ public class AdminController {
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER"})
     @GetMapping("/account/user")
-    public ResponseEntity<?> getUserAccount(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+    public ResponseEntity<?> getUserAccount(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<Member> userAccount = memberService.findUserAccount(pageable);
         List<Account> collect = userAccount.getContent()
                 .stream()
@@ -562,6 +562,7 @@ public class AdminController {
         Article save = articleService.save(Article.builder()
                 .title(createArticleRequest.getTitle())
                 .content(createArticleRequest.getContent())
+                .thumbnail(createArticleRequest.getThumbnail())
                 .articleType(articleType)
                 .createAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .member(memberPrincipal.getMember())
@@ -569,7 +570,7 @@ public class AdminController {
                 .build());
 
         return ResponseEntity.ok()
-                .body(new CreateNoticeResponse(true, save.getId(), save.getTitle()));
+                .body(new CreateArticleResponse(true, save.getId(), save.getTitle(), save.getThumbnail()));
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STAFF"})
@@ -628,7 +629,7 @@ public class AdminController {
         Article article = articleService.findOneById(id)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."));
 
-        if (article.getMember().getId() != member.getId()) {
+        if (!article.getMember().getId().equals(member.getId())) {
             if (!member.isAdmin() || !member.isManager()) {
                 throw new CustomException(HttpStatus.UNAUTHORIZED, "게시글 수정 권한이 없습니다.");
             }
@@ -640,6 +641,7 @@ public class AdminController {
                 .id(id)
                 .title(modifyArticleRequest.getTitle())
                 .content(modifyArticleRequest.getContent())
+                .thumbnail(modifyArticleRequest.getThumbnail())
                 .articleType(articleType)
                 .createAt(article.getCreateAt())
                 .view(article.getView())
@@ -661,7 +663,7 @@ public class AdminController {
         Article article = articleService.findOneById(id)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."));
 
-        if (article.getMember().getId() != member.getId()) {
+        if (!article.getMember().getId().equals(member.getId())) {
             if (!member.isAdmin() || !member.isManager()) {
                 throw new CustomException(HttpStatus.UNAUTHORIZED, "게시글 삭제 권한이 없습니다.");
             }

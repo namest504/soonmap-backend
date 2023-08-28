@@ -151,13 +151,13 @@ public class MemberController {
 
     @PostMapping("/join/check")
     public ResponseEntity<Void> sendEmailWithAuthCode(@RequestBody @Valid MemberEmailRequest memberEmailRequest) {
-        if (memberService.findUserByEmail(memberEmailRequest.getEmail()).isPresent()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 입니다.");
-        }
         if (!memberEmailRequest.getEmail().matches("^[a-z0-9]+$")) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "입력된 형식이 올바르지 않습니다.");
         }
         String userEmailWithSCH = memberEmailRequest.getEmail() + "@sch.ac.kr";
+        if (memberService.findUserByEmail(userEmailWithSCH).isPresent()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 입니다.");
+        }
         String generatedAuthCode = generateAuthCode();
         mailService.mailSend(userEmailWithSCH, generatedAuthCode);
         memberService.saveJoinConfirmAuthCode(userEmailWithSCH, generatedAuthCode);
@@ -188,6 +188,9 @@ public class MemberController {
         }
         if (memberService.findUserByUserId(memberJoinRequest.getId()).isPresent()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "이미 가입된 아이디 입니다.");
+        }
+        if (!memberJoinRequest.getId().matches("^[a-z0-9]+$")) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "입력된 형식이 올바르지 않습니다.");
         }
         Claims claims = jwtProvider.decodeJwtToken(memberJoinRequest.getRegisterToken());
         Member member = memberService.saveUser(claims, memberJoinRequest);
