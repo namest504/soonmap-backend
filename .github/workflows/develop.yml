@@ -2,7 +2,7 @@ name: CICD
 
 on:
   pull_request:
-    branches: [ "deploy" ]
+    branches: [ "develop" ]
 
 permissions:
   contents: read
@@ -20,13 +20,6 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - uses: actions/checkout@v3
-      - name: Make application.properties
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.PROPERTIES }}" > src/main/resources/application-prod.yml
-          find src
-
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
@@ -38,16 +31,16 @@ jobs:
       - name: Docker build
         run: |
           docker login -u ${{ secrets.DOCKER_ID }} -p ${{ secrets.DOCKER_PW }}
-          docker build -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }} .
-          docker push ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}
+          docker build -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }} .
+          docker push ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
 
       - name: EC2 Deploy
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.EC2_DEV_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}
-            docker stop ${{ secrets.DOCKER_IMAGE_NAME }}
-            docker run -d --rm --name ${{ secrets.DOCKER_IMAGE_NAME }} -p 8080:8080 ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}
+            docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
+            docker stop ${{ secrets.DOCKER_DEV_IMAGE_NAME }}
+            docker run -d --rm --name ${{ secrets.DOCKER_DEV_IMAGE_NAME }} -p 8080:8080 ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
