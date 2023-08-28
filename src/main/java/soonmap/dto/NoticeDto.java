@@ -55,6 +55,7 @@ public class NoticeDto {
         private boolean success;
         private Long id;
         private String title;
+        private String thumbnail;
     }
 
     @Getter
