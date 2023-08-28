@@ -17,7 +17,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (CustomException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED);
         }
     }
 }
