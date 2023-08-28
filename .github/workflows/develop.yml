@@ -50,4 +50,4 @@ jobs:
           script: |
             docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
             docker stop ${{ secrets.DOCKER_DEV_IMAGE_NAME }}
-            docker run -d --rm --name ${{ secrets.DOCKER_DEV_IMAGE_NAME }} -p 8080:8080 ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
+            docker run -d --rm --name ${{ secrets.DOCKER_DEV_IMAGE_NAME }} --network sm-net -p 8080:8080 ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
