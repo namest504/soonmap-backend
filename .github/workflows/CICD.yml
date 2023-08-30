@@ -38,7 +38,7 @@ jobs:
       - name: Docker build
         run: |
           docker login -u ${{ secrets.DOCKER_ID }} -p ${{ secrets.DOCKER_PW }}
-          docker build --build-arg PROFILE="prod" -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }} .
+          docker build --build-arg PROFILE=prod -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }} .
           docker push ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}
 
       - name: EC2 Deploy
@@ -51,3 +51,6 @@ jobs:
             docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}
             docker stop ${{ secrets.DOCKER_IMAGE_NAME }}
             docker run -d --rm --name ${{ secrets.DOCKER_IMAGE_NAME }} -p 8080:8080 ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}
+            docker rmi $(docker images -f "dangling=true" -q)
+            docker images -a
+            docker ps -a
