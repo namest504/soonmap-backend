@@ -20,7 +20,7 @@ public class JwtProvider {
     @Value("${JWT_SECRET_KEY}")
     private String JWT_SECRET_KEY;
 
-    private final Long accessTokenValidTime = 1000 * 60L * 1L; // 5분
+    private final Long accessTokenValidTime = 1000 * 60L * 60L; // 60분
     private final Long refreshTokenValidTime = 1000 * 60 * 60 * 24 * 7L; // 1주
 
     private final MemberRepository memberRepository;
