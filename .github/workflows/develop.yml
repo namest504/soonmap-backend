@@ -1,8 +1,8 @@
-name: CICD
+name: develop
 
 on:
   pull_request:
-    branches: [ "deploy" ]
+    branches: [ "develop" ]
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
       - name: Make application.properties
         run: |
           mkdir -p src/main/resources
-          echo "${{ secrets.PROPERTIES }}" > src/main/resources/application-prod.yml
+          echo "${{ secrets.PROPERTIES_TEST }}" > src/main/resources/application-test.yml
           find src
 
       - name: Grant execute permission for gradlew
@@ -32,25 +32,25 @@ jobs:
         shell: bash
 
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew build
         shell: bash
 
       - name: Docker build
         run: |
           docker login -u ${{ secrets.DOCKER_ID }} -p ${{ secrets.DOCKER_PW }}
-          docker build --build-arg PROFILE=prod -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }} .
-          docker push ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}
+          docker build --build-arg PROFILE=test -t ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }} .
+          docker push ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
 
       - name: EC2 Deploy
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.EC2_DEV_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}
-            docker stop ${{ secrets.DOCKER_IMAGE_NAME }}
-            docker run -d --rm --name ${{ secrets.DOCKER_IMAGE_NAME }} -p 8080:8080 ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_IMAGE_NAME }}
+            docker pull ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
+            docker stop ${{ secrets.DOCKER_DEV_IMAGE_NAME }}
+            docker run -d --rm --name ${{ secrets.DOCKER_DEV_IMAGE_NAME }} --network sm-net -p 8080:8080 ${{ secrets.DOCKER_ID }}/${{ secrets.DOCKER_DEV_IMAGE_NAME }}
             docker rmi $(docker images -f "dangling=true" -q)
             docker images -a
             docker ps -a

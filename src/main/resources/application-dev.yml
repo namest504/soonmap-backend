@@ -22,7 +22,7 @@ spring:
       maxFileSize: 50MB
       maxRequestSize: 50MB
 
-# Naver Config Vars
+  # Naver Config Vars
   client:
     id: ${Client ID}
     secret: ${Client Secret}
@@ -30,7 +30,7 @@ spring:
     session-state: ${SESSION_STATE}
   profile-api-url: ${PROFILE_API}
 
-# Kakao Config Vars
+  # Kakao Config Vars
   kakao:
     client_id: ${KAKAO_RESTAPI_KEY}
     redirect_uri: ${KAKAO_REDIRECT_URL}
