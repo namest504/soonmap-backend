@@ -20,7 +20,7 @@ public class JwtProvider {
     @Value("${JWT_SECRET_KEY}")
     private String JWT_SECRET_KEY;
 
-    private final Long accessTokenValidTime = 1000 * 60L * 5L; // 5분
+    private final Long accessTokenValidTime = 1000 * 60L * 60L; // 60분
     private final Long refreshTokenValidTime = 1000 * 60 * 60 * 24 * 7L; // 1주
 
     private final MemberRepository memberRepository;
@@ -78,7 +78,7 @@ public class JwtProvider {
 
             return true;
         } catch (Exception e) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다.");
+            throw new CustomException(HttpStatus.I_AM_A_TEAPOT, "잘못된 토큰입니다.");
         }
     }
 
@@ -90,7 +90,7 @@ public class JwtProvider {
         } catch (SecurityException | MalformedJwtException | ExpiredJwtException
                  | UnsupportedJwtException
                  | IllegalArgumentException | SignatureException e) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 접근입니다.");
+            throw new CustomException(HttpStatus.NOT_ACCEPTABLE, "잘못된 접근입니다.");
         }
     }
 
