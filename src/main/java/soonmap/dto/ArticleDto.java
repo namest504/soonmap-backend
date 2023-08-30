@@ -79,6 +79,30 @@ public class ArticleDto {
 
     @Getter
     @Setter
+    @AllArgsConstructor
+    public static class ArticlePageResponseWithOutContent {
+        private int totalPage;
+        private List<ArticleResponseWithOutContent> articleList;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ArticleResponseWithOutContent {
+        private Long id;
+        private String title;
+        private LocalDateTime createAt;
+        private String writer;
+        private String articleTypeName;
+        private int view;
+
+        public static ArticleResponseWithOutContent of(Article article) {
+            return new ArticleResponseWithOutContent(article.getId(), article.getTitle(), article.getCreateAt(), article.getMember().getUsername(), article.getArticleType().getTypeName(), article.getView());
+        }
+    }
+
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ModifyArticleRequest {
